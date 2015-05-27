@@ -1,0 +1,41 @@
+# default config.yml for ItemRestrict
+# config version 1.3
+
+General:
+    #Enable restrictions on all worlds. (true or false)
+    EnableOnAllWorlds: true
+    #If EnableOnAllWorlds: false | Enable restrictions on following worlds only:
+    Worlds:
+    - world
+    - test
+    
+    #Enable the world scanner. (true or false)
+    #Runs every minute and scans 5% of loaded chunks.
+    WorldScannerON: false
+    
+    #Enable or disable optional restrictions. (true or false)
+    Restrictions:
+        #Brewing Stand Restrictions. Block potions from brewing.
+        EnableBrewingBans: false
+        
+
+#Chat messages. Supports color and format codes. 
+#Minecraft Color and Format Codes: http://minecraft.gamepedia.com/Formatting_codes
+chatMessages:
+    #Chat messages prefix.
+    #To disable the prefix set it to '' ; Example: prefix: ''
+    prefix: '&4&l[ItemRestrict] '
+    
+    #Chat messages.
+    #The place holder:  %reason  will be replaced with the reason provided in the RestrictedItems.yml
+    noPermission: '&cYou do not have permission!'
+    restrictedConfiscated: '&cRestricted item confiscated! Reason: &7%reason'
+    restricted: '&cRestricted item! Reason: &7%reason'
+    pickupRestricted: '&cYou cant pickup a restricted item. Reason: &7%reason'
+    ussageRestricted: '&cUssage of this item is restricted. Reason: &7%reason'
+    craftingRestricted: '&cCrafting of this item is restricted. Reason: &7%reason'
+    placementRestricted: '&cPlacement of this block is restricted. Reason: &7%reason'
+    creativeRestricted: '&cYou cant use this in Creative Mode! Reason: &7%reason'
+    reload: '&cConfig and RestrictedItems reload complete!'
+    unknownCommand: '&cUnknown command! for help do:&7 /itemrestrict'
+    brewingRestricted: '&cThis potion is restricted! Reason: &7%reason'

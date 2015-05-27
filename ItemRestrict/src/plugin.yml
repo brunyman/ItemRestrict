@@ -1,0 +1,16 @@
+name: ItemRestrict
+main: net.craftersland.itemrestrict.ItemRestrict
+version: 1.3
+author: CraftersLand
+load: STARTUP
+website: www.craftersland.net
+commands:
+    itemrestrict:
+        description: Main command.
+permissions:
+    ItemRestrict.admin:
+        description: Bypass restrictions and access to reload command.
+        default: op
+    ItemRestrict.bypass:
+        description: Bypass restrictions.
+        default: false
