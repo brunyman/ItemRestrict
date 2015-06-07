@@ -1,6 +1,6 @@
 name: ItemRestrict
 main: net.craftersland.itemrestrict.ItemRestrict
-version: 1.3
+version: 1.4
 author: CraftersLand
 load: STARTUP
 website: www.craftersland.net

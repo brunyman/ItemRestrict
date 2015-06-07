@@ -68,9 +68,11 @@ public class PlayerHandler implements Listener {
 			if(bannedInfo != null) {
 				event.setCancelled(true);
 				
+				//CHANGED SO ALL RESTRICTED ITEMS WILL GET CONFISCATED
 				if (event.getInventory().getType() != InventoryType.CRAFTING) {
-					player.playSound(player.getLocation(), Sound.NOTE_PLING, 1, 1);
-					itemrestrict.getConfigHandler().printMessage(player, "chatMessages.restricted", bannedInfo.reason);
+					event.getInventory().remove(item2);
+					player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+					itemrestrict.getConfigHandler().printMessage(player, "chatMessages.restrictedConfiscated", bannedInfo.reason);
 				} else {
 					player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
 					player.getInventory().remove(item2);
