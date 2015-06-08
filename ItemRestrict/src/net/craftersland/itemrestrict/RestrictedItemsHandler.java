@@ -153,6 +153,7 @@ public class RestrictedItemsHandler {
 		MaterialData bannedInfo = collectionToSearch.Contains(new MaterialData(typeId, data, null, null));
 		if(bannedInfo != null)
 		{
+			if (player == null) return bannedInfo;
 			if(player.hasPermission("ItemRestrict.bypass." + typeId + ".*.*")) return null;
 			if(player.hasPermission("ItemRestrict.bypass." + typeId + ".*." + permissionNode)) return null;
 			if(player.hasPermission("ItemRestrict.bypass." + typeId + "." + data + "." + permissionNode)) return null;			
