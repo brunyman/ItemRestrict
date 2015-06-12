@@ -143,6 +143,9 @@ public class PlayerHandler implements Listener {
 			bannedInfo = itemrestrict.getRestrictedItemsHandler().isBanned(ActionType.Usage, player, player.getItemInHand().getTypeId(), player.getItemInHand().getData().getData(), player.getLocation());
 			if(bannedInfo != null) {
 				event.setCancelled(true);
+				if (player.getOpenInventory() != null) {
+					player.getOpenInventory().close();
+				}
 				player.playSound(player.getLocation(), Sound.NOTE_PLING, 1, 1);
 				player.updateInventory();
 				itemrestrict.getConfigHandler().printMessage(player, "chatMessages.ussageRestricted", bannedInfo.reason);
