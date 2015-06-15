@@ -1,8 +1,8 @@
 name: ItemRestrict
 main: net.craftersland.itemrestrict.ItemRestrict
-version: 1.4.2
+version: 1.4.3
 author: CraftersLand
-load: STARTUP
+load: POSTWORLD
 website: www.craftersland.net
 commands:
     itemrestrict:
