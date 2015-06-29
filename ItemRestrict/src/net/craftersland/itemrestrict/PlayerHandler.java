@@ -47,7 +47,11 @@ public class PlayerHandler implements Listener {
 				event.setCancelled(true);
 				
 				player.getInventory().remove(item);
-				player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+				
+				if (itemrestrict.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+					player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+				}
+				
 				itemrestrict.getConfigHandler().printMessage(player, "chatMessages.creativeRestricted", bannedInfo3.reason);
 				return;
 			}
@@ -58,7 +62,9 @@ public class PlayerHandler implements Listener {
 				event.setCancelled(true);
 				
 				player.getInventory().remove(item);
-				player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+				if (itemrestrict.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+					player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+				}
 				player.updateInventory();
 				itemrestrict.getConfigHandler().printMessage(player, "chatMessages.restrictedConfiscated", bannedInfo2.reason);
 				return;
@@ -71,10 +77,14 @@ public class PlayerHandler implements Listener {
 				//CHANGED SO ALL RESTRICTED ITEMS WILL GET CONFISCATED
 				if (event.getInventory().getType() != InventoryType.CRAFTING) {
 					event.getInventory().remove(item2);
-					player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+					if (itemrestrict.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+						player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+					}
 					itemrestrict.getConfigHandler().printMessage(player, "chatMessages.restrictedConfiscated", bannedInfo.reason);
 				} else {
-					player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+					if (itemrestrict.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+						player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+					}
 					player.getInventory().remove(item2);
 					player.updateInventory();
 					itemrestrict.getConfigHandler().printMessage(player, "chatMessages.restrictedConfiscated", bannedInfo.reason);
@@ -94,7 +104,9 @@ public class PlayerHandler implements Listener {
 			if(bannedInfo != null) {
 				itemrestrict.getConfigHandler().printMessage(player, "chatMessages.pickupRestricted", bannedInfo.reason);
 				event.getItem().remove();
-				player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+				if (itemrestrict.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+					player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+				}
 				player.playEffect(player.getLocation(), Effect.MOBSPAWNER_FLAMES, 1);
 				player.updateInventory();
 				event.setCancelled(true);						
@@ -113,7 +125,10 @@ public class PlayerHandler implements Listener {
 			if(bannedInfo != null)
 			{
 				event.setCancelled(true);
-				player.playSound(player.getLocation(), Sound.NOTE_PLING, 1, 1);
+				if (itemrestrict.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+					player.playSound(player.getLocation(), Sound.NOTE_PLING, 1, 1);
+				}
+				
 				itemrestrict.getConfigHandler().printMessage(player, "chatMessages.craftingRestricted", bannedInfo.reason);
 			}
 		}
@@ -133,7 +148,10 @@ public class PlayerHandler implements Listener {
 			if(bannedInfo != null) {
 				event.setCancelled(true);
 				player.getInventory().setItemInHand(new ItemStack(Material.AIR));
-				player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+				if (itemrestrict.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+					player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+				}
+				
 				player.updateInventory();
 				ItemRestrict.log.info("Confiscated " + bannedInfo.toString() + " from " + player.getName() + ".");
 				itemrestrict.getConfigHandler().printMessage(player, "chatMessages.restrictedConfiscated", bannedInfo.reason);
@@ -146,7 +164,9 @@ public class PlayerHandler implements Listener {
 				if (player.getOpenInventory() != null) {
 					player.getOpenInventory().close();
 				}
-				player.playSound(player.getLocation(), Sound.NOTE_PLING, 1, 1);
+				if (itemrestrict.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+					player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 1);
+				}
 				player.updateInventory();
 				itemrestrict.getConfigHandler().printMessage(player, "chatMessages.ussageRestricted", bannedInfo.reason);
 			} else {
@@ -157,7 +177,10 @@ public class PlayerHandler implements Listener {
 					//Drop the item in hand
 					player.getWorld().dropItem(player.getLocation(), player.getItemInHand());
 					player.setItemInHand(new ItemStack(Material.AIR));
-					player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
+					if (itemrestrict.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+						player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
+					}
+					
 					player.updateInventory();
 					itemrestrict.getConfigHandler().printMessage(player, "chatMessages.placementRestricted", bannedInfo.reason);
 				}
@@ -168,8 +191,11 @@ public class PlayerHandler implements Listener {
 				
 				bannedInfo = itemrestrict.getRestrictedItemsHandler().isBanned(ActionType.Usage, player, block.getTypeId(), block.getData(), block.getLocation());
 				if(bannedInfo != null) {
-					event.setCancelled(true);	
-					player.playSound(player.getLocation(), Sound.NOTE_PLING, 1, 1);
+					event.setCancelled(true);
+					if (itemrestrict.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+						player.playSound(player.getLocation(), Sound.NOTE_PLING, 1, 1);
+					}
+					
 					player.updateInventory();
 					itemrestrict.getConfigHandler().printMessage(player, "chatMessages.ussageRestricted", bannedInfo.reason);
 				} else {
@@ -177,7 +203,9 @@ public class PlayerHandler implements Listener {
 					if(bannedInfo != null)
 					{
 						event.setCancelled(true);
-						player.playSound(player.getLocation(), Sound.NOTE_PLING, 1, 1);
+						if (itemrestrict.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+							player.playSound(player.getLocation(), Sound.NOTE_PLING, 1, 1);
+						}
 						itemrestrict.getConfigHandler().printMessage(player, "chatMessages.placementRestricted", bannedInfo.reason);
 					}
 				}
@@ -203,7 +231,10 @@ public class PlayerHandler implements Listener {
 				//Drop the item in hand
 				player.getWorld().dropItem(player.getLocation(), player.getItemInHand());
 				player.setItemInHand(new ItemStack(Material.AIR));
-				player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
+				if (itemrestrict.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+					player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
+				}
+				
 				player.updateInventory();
 				//Send message
 				itemrestrict.getConfigHandler().printMessage(player, "chatMessages.ussageRestricted", bannedInfo.reason);

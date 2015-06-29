@@ -41,11 +41,17 @@ public class CommandHandler implements CommandExecutor {
 							itemrestrict.onReload();
 							
 							itemrestrict.getConfigHandler().printMessage(p, "chatMessages.reload", "");
-							p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
+							if (itemrestrict.getConfigHandler().getString("General.Sounds.onCommands").matches("true")) {
+								p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
+							}
+							
 							return true;
 						} else {
 							itemrestrict.getConfigHandler().printMessage(p, "chatMessages.noPermission", "");
-							p.playSound(p.getLocation(), Sound.NOTE_PLING, 1.0F, 1.0F);
+							
+							if (itemrestrict.getConfigHandler().getString("General.Sounds.onCommands").matches("true")) {
+								p.playSound(p.getLocation(), Sound.NOTE_PLING, 1.0F, 1.0F);
+							}
 							return false;
 						}
 					} else {
@@ -70,7 +76,9 @@ public class CommandHandler implements CommandExecutor {
 				if (sender instanceof Player) {
 					p = (Player) sender;
 					itemrestrict.getConfigHandler().printMessage(p, "chatMessages.unknownCommand", "");
-					p.playSound(p.getLocation(), Sound.NOTE_PLING, 1.0F, 1.0F);
+					if (itemrestrict.getConfigHandler().getString("General.Sounds.onCommands").matches("true")) {
+						p.playSound(p.getLocation(), Sound.NOTE_PLING, 1.0F, 1.0F);
+					}
 				} else {
 					sender.sendMessage(ChatColor.RED + "Unknown command for help do /itemrestrict");
 				}
@@ -81,7 +89,10 @@ public class CommandHandler implements CommandExecutor {
 	
 	//Player help page
 	public void sendHelp(Player p) {
-		p.playSound(p.getLocation(), Sound.ANVIL_LAND, 1, 1);
+		if (itemrestrict.getConfigHandler().getString("General.Sounds.onCommands").matches("true")) {
+			p.playSound(p.getLocation(), Sound.ANVIL_LAND, 1, 1);
+		}
+		
 		p.sendMessage(" ");
 		p.sendMessage(ChatColor.DARK_RED + "-=-=-=-=-=-=-=-=-=-< " + ChatColor.RED + "" + ChatColor.BOLD + "ItemRestrict" + ChatColor.DARK_RED + " >-=-=-=-=-=-=-=-=-=-");
 		if (p.hasPermission("ItemRestrict.admin")) {
