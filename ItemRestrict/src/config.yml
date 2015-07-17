@@ -1,5 +1,5 @@
 # default config.yml for ItemRestrict
-# config version 1.5
+# config version 1.6
 
 General:
     #Enable restrictions on all worlds. (true or false)
@@ -24,6 +24,8 @@ General:
     Restrictions:
         #Brewing Stand Restrictions. Block potions from brewing.
         EnableBrewingBans: false
+        #Resting the wearing of certain armors.
+        ArmorWearingBans: false
         
 
 #Chat messages. Supports color and format codes. 
@@ -46,3 +48,4 @@ chatMessages:
     reload: '&cConfig and RestrictedItems reload complete!'
     unknownCommand: '&cUnknown command! for help do:&7 /itemrestrict'
     brewingRestricted: '&cThis potion is restricted! Reason: &7%reason'
+    wearingRestricted: '&cYou cant wear this armor! Reason: &7%reason'

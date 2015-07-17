@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import net.craftersland.itemrestrict.RestrictedItemsHandler.ActionType;
 import net.craftersland.itemrestrict.itemsprocessor.MaterialCollection;
 import net.craftersland.itemrestrict.itemsprocessor.MaterialData;
 
@@ -11,8 +12,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,6 +29,7 @@ public class ItemRestrict extends JavaPlugin {
 	public MaterialCollection ownershipBanned = new MaterialCollection();
 	public MaterialCollection craftingBanned = new MaterialCollection();
 	public MaterialCollection brewingBanned = new MaterialCollection();
+	public MaterialCollection wearingBanned = new MaterialCollection();
 	public MaterialCollection creativeBanned = new MaterialCollection();
 	public MaterialCollection usageBanned = new MaterialCollection();
 	public MaterialCollection placementBanned = new MaterialCollection();
@@ -56,10 +61,16 @@ public class ItemRestrict extends JavaPlugin {
     	CommandHandler cH = new CommandHandler(this);
     	getCommand("itemrestrict").setExecutor(cH);
     	
-    	if (configHandler.getString("General.Restrictions.EnableBrewingBans") != "false") {
-    		log.info("Optional restrictions enabled: BrewingBans");
+    	if (configHandler.getString("General.Restrictions.EnableBrewingBans").matches("true")) {
+    		log.info("Brewing restrictions enabled!");
     	} else {
-    		log.info("Optional restrictions enabled: none");
+    		log.info("Brewing restrictions disabled!");
+    	}
+    	if (configHandler.getString("General.Restrictions.ArmorWearingBans").matches("true")) {
+    		log.info("Wearing restrictions enabled!");
+    		wearingRestrictions();
+    	} else {
+    		log.info("Wearing restrictions disabled!");
     	}
     	
     	if (configHandler.getString("General.WorldScannerON") == "true") {
@@ -171,6 +182,87 @@ public class ItemRestrict extends JavaPlugin {
 	}
 	public MaterialCollection getMaterialCollection() {
 		return materialCollection;
+	}
+	
+	//WEARING RESTRICTIONS TASK
+	private void wearingRestrictions() {
+		Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
+			@SuppressWarnings("deprecation")
+			@Override
+			public void run() {
+				for (final Player p : Bukkit.getOnlinePlayers()) {
+					final ItemStack boots = p.getInventory().getBoots();
+					final ItemStack leggings = p.getInventory().getLeggings();
+					final ItemStack chestplate = p.getInventory().getChestplate();
+					final ItemStack helmet = p.getInventory().getHelmet();
+					
+					if (boots != null) {
+						MaterialData bannedInfo = getRestrictedItemsHandler().isBanned(ActionType.Wearing, p, boots.getTypeId(), boots.getData().getData(), p.getLocation());
+						if (bannedInfo != null) {
+							getConfigHandler().printMessage(p, "chatMessages.wearingRestricted", bannedInfo.reason);
+							Bukkit.getScheduler().runTask(ItemRestrict.this, new Runnable() {
+								@Override
+								public void run() {
+									
+									p.getWorld().dropItem(p.getLocation(), boots);
+									p.getInventory().setBoots(new ItemStack(Material.AIR));
+									p.updateInventory();
+									p.playSound(p.getLocation(), Sound.NOTE_PLING, 1, 1);
+								}
+							});
+						}
+					}
+					if (leggings != null) {
+						MaterialData bannedInfo = getRestrictedItemsHandler().isBanned(ActionType.Wearing, p, leggings.getTypeId(), leggings.getData().getData(), p.getLocation());
+						if (bannedInfo != null) {
+							getConfigHandler().printMessage(p, "chatMessages.wearingRestricted", bannedInfo.reason);
+							Bukkit.getScheduler().runTask(ItemRestrict.this, new Runnable() {
+								@Override
+								public void run() {
+									
+									p.getWorld().dropItem(p.getLocation(), leggings);
+									p.getInventory().setLeggings(new ItemStack(Material.AIR));
+									p.updateInventory();
+									p.playSound(p.getLocation(), Sound.NOTE_PLING, 1, 1);
+								}
+							});
+						}
+					}
+					if (chestplate != null) {
+						MaterialData bannedInfo = getRestrictedItemsHandler().isBanned(ActionType.Wearing, p, chestplate.getTypeId(), chestplate.getData().getData(), p.getLocation());
+						if (bannedInfo != null) {
+							getConfigHandler().printMessage(p, "chatMessages.wearingRestricted", bannedInfo.reason);
+							Bukkit.getScheduler().runTask(ItemRestrict.this, new Runnable() {
+								@Override
+								public void run() {
+									
+									p.getWorld().dropItem(p.getLocation(), chestplate);
+									p.getInventory().setChestplate(new ItemStack(Material.AIR));
+									p.updateInventory();
+									p.playSound(p.getLocation(), Sound.NOTE_PLING, 1, 1);
+								}
+							});
+						}
+					}
+					if (helmet != null) {
+						MaterialData bannedInfo = getRestrictedItemsHandler().isBanned(ActionType.Wearing, p, helmet.getTypeId(), helmet.getData().getData(), p.getLocation());
+						if (bannedInfo != null) {
+							getConfigHandler().printMessage(p, "chatMessages.wearingRestricted", bannedInfo.reason);
+							Bukkit.getScheduler().runTask(ItemRestrict.this, new Runnable() {
+								@Override
+								public void run() {
+									
+									p.getWorld().dropItem(p.getLocation(), helmet);
+									p.getInventory().setHelmet(new ItemStack(Material.AIR));
+									p.updateInventory();
+									p.playSound(p.getLocation(), Sound.NOTE_PLING, 1, 1);
+								}
+							});
+						}
+					}
+				}
+			}
+		}, 20L, 20L);
 	}
 
 }

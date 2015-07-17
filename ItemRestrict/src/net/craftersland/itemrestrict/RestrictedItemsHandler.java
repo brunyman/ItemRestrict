@@ -53,6 +53,13 @@ public class RestrictedItemsHandler {
 			parseMaterialListFromConfig(BrewingBanned, itemrestrict.brewingBanned, "BrewingBanned");
 			
 			//
+			//WEARING BANS 
+			//
+			List<String> WearingBanned = ymlFormat.getStringList("WearingBanned");
+			//parse the strings from the config file
+			parseMaterialListFromConfig(WearingBanned, itemrestrict.wearingBanned, "WearingBanned");
+			
+			//
 			//USAGE BANS 
 			//
 			List<String> UsageBanned = ymlFormat.getStringList("UsageBanned");
@@ -139,6 +146,11 @@ public class RestrictedItemsHandler {
 			collectionToSearch = itemrestrict.brewingBanned;
 			permissionNode = "brew";
 		}
+		else if(actionType == ActionType.Wearing)
+		{
+			collectionToSearch = itemrestrict.wearingBanned;
+			permissionNode = "wear";
+		}
 		else if(actionType == ActionType.Creative)
 		{
 			collectionToSearch = itemrestrict.creativeBanned;
@@ -167,7 +179,7 @@ public class RestrictedItemsHandler {
 	
 	public enum ActionType
 	{
-		Usage, Ownership, Placement, Crafting, Creative, Brewing
+		Usage, Ownership, Placement, Crafting, Creative, Brewing, Wearing
 	}
 
 }

@@ -109,7 +109,7 @@ public class PlayerHandler implements Listener {
 				}
 				player.playEffect(player.getLocation(), Effect.MOBSPAWNER_FLAMES, 1);
 				player.updateInventory();
-				event.setCancelled(true);						
+				event.setCancelled(true);					
 			} 
 		}
 		

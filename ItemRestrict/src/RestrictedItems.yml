@@ -30,6 +30,11 @@ CraftingBanned:
 BrewingBanned:
 - 373:16:Awkward Potion:Example setting, you may need to remove this!
 
+#WEARING ARMOR BANS - Block wearing of certain armors.
+#(Optional restriction - Default is disabled - check config.yml)
+WearingBanned:
+- 311:*:DiamondChestPlate:Example setting, you may need to remove this!
+
 #CREATIVE MODE BANS - Block using/getting these items with creative mode on only! You don't need to add here items already added to OwnershipBanned.
 CreativeBanned:
 - 399:*:Nether Star:Example setting, you may need to remove this!

@@ -102,7 +102,7 @@ private ItemRestrict itemrestrict;
 				}
 				//If there is a viewer on the brewing stand send the restricted message
 				if (player != null && restricted == true) {
-					player.getInventory().addItem(ingredient);
+					player.getInventory().addItem(new ItemStack(ingredient.getType(), 1));
 					itemrestrict.getConfigHandler().printMessage(player, "chatMessages.brewingRestricted", reason);
 					player.playSound(player.getLocation(), Sound.NOTE_PLING, 1F, 1F);
 				}
