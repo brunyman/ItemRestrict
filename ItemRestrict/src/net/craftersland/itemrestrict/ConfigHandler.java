@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -12,7 +13,7 @@ public class ConfigHandler {
 	
 	private ItemRestrict itemrestrict;
 	
-	public ConfigHandler(ItemRestrict itemrestrict) {
+	public ConfigHandler(final ItemRestrict itemrestrict) {
 		this.itemrestrict = itemrestrict;
 		
 		        //Create the config file
@@ -31,31 +32,46 @@ public class ConfigHandler {
 				//Check the worlds the restrictions will take place
 				if (getString("General.EnableOnAllWorlds") == "true") {
 					//Restrictions will take place on all worlds
-
+					ItemRestrict.log.info("Restrictions enabled on all worlds.");
 				} else {
 					//Get worlds to enable restrictions from config
-					List<String> enabledWorlds = itemrestrict.getConfig().getStringList("General.Worlds");
+					final List<String> enabledWorlds = itemrestrict.getConfig().getStringList("General.Worlds");
+					ItemRestrict.log.info("Scanning for loaded worlds in 10 seconds...");
 					
-					//validate that list
-					itemrestrict.enforcementWorlds = new ArrayList<World>();
-					for(int i = 0; i < enabledWorlds.size(); i++)
-					{
-						String worldName = enabledWorlds.get(i);
-						World world = itemrestrict.getServer().getWorld(worldName);
-						if(world == null)
-						{
-							ItemRestrict.log.warning("Error: There's no world named " + worldName + ".  Please update your config.yml.");
+					Bukkit.getScheduler().runTaskLaterAsynchronously(itemrestrict, new Runnable() {
+
+						@Override
+						public void run() {
+							//validate that list
+							itemrestrict.enforcementWorlds = new ArrayList<World>();
+							ItemRestrict.log.info("Scanning for loaded worlds...");
+							for(int i = 0; i < enabledWorlds.size(); i++)
+							{
+								String worldName = enabledWorlds.get(i);
+								World world = itemrestrict.getServer().getWorld(worldName);
+								if(world == null)
+								{
+									ItemRestrict.log.warning("Error: There's no world named " + worldName + ".  Please update your config.yml.");
+								}
+								else
+								{
+									itemrestrict.enforcementWorlds.add(world);
+								}
+							}
+							if(enabledWorlds.size() == 0)
+							{			
+								ItemRestrict.log.warning("No worlds found listed in config! Restrictions will not take place!");
+							}
+							//List the world names found.
+							ArrayList<String> worldNames = new ArrayList<String>();
+							for (World x : itemrestrict.enforcementWorlds) {
+								worldNames.add(x.getName());
+							}
+							ItemRestrict.log.info("Plugin enabled on worlds: " + worldNames.toString());
 						}
-						else
-						{
-							itemrestrict.enforcementWorlds.add(world);
-						}
-					}
+						
+					}, 200L);
 					
-					if(enabledWorlds == null || enabledWorlds.size() == 0)
-					{			
-						ItemRestrict.log.warning("No worlds found listed in config! Restrictions will not take place!");
-					}
 				}
 				
 	}

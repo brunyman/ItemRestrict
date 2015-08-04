@@ -1,5 +1,5 @@
 # default config.yml for ItemRestrict
-# config version 1.6
+# config version 1.6.1
 
 General:
     #Enable restrictions on all worlds. (true or false)
