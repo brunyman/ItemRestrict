@@ -1,0 +1,68 @@
+# default config.yml for ItemRestrict
+# config version 2.1.0
+
+General:
+    #Enable restrictions on all worlds. (true or false)
+    EnableOnAllWorlds: true
+    #If EnableOnAllWorlds: false | Enable restrictions on following worlds only:
+    Worlds:
+    - world
+    - test
+    
+    #Enable the world scanner. (true or false)
+    #Runs every minute and scans 5% of loaded chunks.
+    WorldScannerON: false
+    #World Scanner scan delay in minutes. Default 1 minute.
+    WorldScannerDelay: 1
+    
+    #Enable or disable sound effects.
+    Sounds:
+        #Enable or disable sounds when running commands. (true or false)
+        onCommands: true
+        #Enable or disable sound when applying restrictions. (true or false)
+        onRestrictions: true
+    
+    #Enable or disable optional restrictions. (true or false)
+    Restrictions:
+        #Brewing Stand Restrictions. Block potions from brewing.
+        EnableBrewingBans: false
+        #Resting the wearing of certain armors.
+        ArmorWearingBans: false
+        #Creative Mode bans.
+        CreativeBans: false
+        #Pickup bans.
+        PickupBans: false
+        #Drop bans.
+        DropBans: false
+    
+    #Other optional settings
+    Settings:
+        #For Ownership restrictions - restrictions will apply for player inventory only and not all inventory's. (true or false)
+        #This is useful if you use some menus that contain restricted items and prevents the player from using the menu, if this is the case set this to true.
+        OwnershipPlayerInvOnly: false
+        
+        
+
+#Chat messages. Supports color and format codes. 
+#Minecraft Color and Format Codes: http://minecraft.gamepedia.com/Formatting_codes
+chatMessages:
+    #Chat messages prefix.
+    #To disable the prefix set it to '' ; Example: prefix: ''
+    prefix: '&4&l[ItemRestrict] '
+    
+    #Chat messages.
+    #The place holder:  %reason  will be replaced with the reason provided in the RestrictedItems.yml
+    noPermission: '&cYou do not have permission!'
+    restrictedConfiscated: '&cRestricted item confiscated! Reason: &7%reason'
+    restricted: '&cRestricted item! Reason: &7%reason'
+    pickupRestricted: '&cYou cant pickup a restricted item. Reason: &7%reason'
+    ussageRestricted: '&cUssage of this item is restricted. Reason: &7%reason'
+    craftingRestricted: '&cCrafting of this item is restricted. Reason: &7%reason'
+    smeltingRestricted: '&cSmelting of this item is restricted. Reason: &7%reason'
+    placementRestricted: '&cPlacement of this block is restricted. Reason: &7%reason'
+    creativeRestricted: '&cYou cant use this in Creative Mode! Reason: &7%reason'
+    reload: '&cConfig and RestrictedItems reload complete!'
+    unknownCommand: '&cUnknown command! for help do:&7 /itemrestrict'
+    brewingRestricted: '&cThis potion is restricted! Reason: &7%reason'
+    wearingRestricted: '&cYou cant wear this armor! Reason: &7%reason'
+    dropingRestricted: '&cYou cant drop this item! Reason: &7%reason'

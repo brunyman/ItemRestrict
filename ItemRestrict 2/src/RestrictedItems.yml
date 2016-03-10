@@ -1,0 +1,78 @@
+#Restricted Items List - v 2.1.0
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+#How to add items to the restricted list? Here is an example:
+#
+# - itemID:DataValue:Description:BannedReason
+# 
+# itemID -> represents the item ID
+# DataValue -> represents the item damage value, to cover all values use *
+# Description -> here you can type anything, it's useful to type the item name so you know what item you banned
+# BannedReson -> (optional) Here you can provide a reason to let your players know why this item is restricted, the reason will be sent to players when they try to get/interact with a banned item.
+# 
+# Example:
+# - 7:*:Bedrock:You can't get this item!
+# - 383:50:CreeperEgg:Used to grief
+#
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#OWNERSHIP BANS - Block any kind of interaction with these items, like: Getting them from creative menu, item pick up, crafting, usage, placement.
+OwnershipBanned:
+- 137:*:CommandBlock:Example setting, you may need to remove this!
+- 422:*:MineCartCommandBlock:Example setting, you may need to remove this!
+
+#USAGE BANS - Block item or block usage only, also blocks entity damage! You don't need to add here items already added to OwnershipBanned.
+UsageBanned:
+- 145:*:Anvil:Example setting, you may need to remove this!
+
+#CRAFTING BANS - Block crafting without removing the recipe! You don't need to add here items already added to OwnershipBanned.
+CraftingBanned:
+- 57:*:Diamond Block:Example setting, you may need to remove this!
+
+#CRAFTING DISABLED - The following crafting recipes will be completely removed from the game.
+CraftingDisabled:
+- 77:*:StoneButton:Example setting, you may need to remove this!
+
+#SMELTING BANS - Block smelting without removing the recipe! You don't need to add here items already added to OwnershipBanned.
+SmeltingBanned:
+- 17:2:Birch Wood Log:Example setting, you may need to remove this!
+
+#SMELTING DISABLED - Smelting of these items will be disabled for everyone. These smelting recipes will be removed from the game.
+# !!!NOTE!!! - Add here the item resulted after smelting and not the item that will get smelt. Ex. for Iron add iron ingot and not iron ore.
+SmeltingDisabled:
+- 351:2:CactusGreen:Example setting, you may need to remove this!
+
+#PLACEMENT BANS - Block block place only! You don't need to add here items already added to OwnershipBanned.
+PlacementBanned:
+- 7:*:Bedrock:Example setting, you may need to remove this!
+
+#BREWING POTIONS BANS - Block brewing potions in brewing stand!
+#(Optional restriction - Default is disabled - check config.yml)
+BrewingBanned:
+- 373:16:Awkward Potion:Example setting, you may need to remove this!
+
+#WEARING ARMOR BANS - Block wearing of certain armors.
+#(Optional restriction - Default is disabled - check config.yml)
+WearingBanned:
+- 311:*:DiamondChestPlate:Example setting, you may need to remove this!
+
+#CREATIVE MODE BANS - Block using/getting these items with creative mode on only! You don't need to add here items already added to OwnershipBanned.
+#(Optional restriction - Default is disabled - check config.yml)
+CreativeBanned:
+- 399:*:Nether Star:Example setting, you may need to remove this!
+
+#PICKUP BANS - Block item pickup. You don't need to add here items already added to OwnershipBanned.
+#(Optional restriction - Default is disabled - check config.yml)
+PickupBanned:
+- 7:*:Bedrock:Example setting, you may need to remove this!
+
+#DROP BANS - Block item drop. You don't need to add here items already added to OwnershipBanned.
+#(Optional restriction - Default is disabled - check config.yml)
+DropBanned:
+- 265:*:IronIngot:Example setting, you may need to remove this!
+
+#WORLD BANS - The world scanner will remove these from your world.
+#(Optional restriction - Default is disabled - check config.yml)
+WorldBanned:
+- 46:*:TnT:Example setting, you may need to remove this!
+
