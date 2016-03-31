@@ -195,7 +195,7 @@ public class ItemRestrict extends JavaPlugin {
 	    if (version.matches("1.6.4")) {
 	    	log.info("1.6.4 Server version detected!");
 	    	mcpcServer = true;
-	    } else if (version.matches("1.9")) {
+	    } else if (version.matches("1.9") || version.matches("1.9.1") || version.matches("1.9.2")) {
 	    	is19Server = true;
 	    }
 	}
