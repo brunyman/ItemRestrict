@@ -11,6 +11,7 @@ import net.craftersland.itemrestrict.restrictions.Brewing;
 import net.craftersland.itemrestrict.restrictions.Crafting;
 import net.craftersland.itemrestrict.restrictions.Creative;
 import net.craftersland.itemrestrict.restrictions.Drop;
+import net.craftersland.itemrestrict.restrictions.OffHandSwap;
 import net.craftersland.itemrestrict.restrictions.Ownership;
 import net.craftersland.itemrestrict.restrictions.Pickup;
 import net.craftersland.itemrestrict.restrictions.Placement;
@@ -61,6 +62,7 @@ public class ItemRestrict extends JavaPlugin {
 	
 	public void onEnable() {
 		log = getLogger();
+		checkServerVersion();
 		worldScanner.put(false, 0);
 		wearingScanner.put(false, 0);
 		
@@ -87,11 +89,13 @@ public class ItemRestrict extends JavaPlugin {
     	pm.registerEvents(new Placement(this), this);
     	pm.registerEvents(new Pickup(this), this);
     	pm.registerEvents(new Drop(this), this);
+    	if (is19Server == true) {
+    		pm.registerEvents(new OffHandSwap(this), this);
+    	}
     	CommandHandler cH = new CommandHandler(this);
     	getCommand("itemrestrict").setExecutor(cH);
     	
     	printConsoleStatus();
-    	checkServerVersion();
     	
     	if (configHandler.getBoolean("General.Restrictions.ArmorWearingBans") == true) {
     		//Start the wearing scanner task
@@ -195,7 +199,7 @@ public class ItemRestrict extends JavaPlugin {
 	    if (version.matches("1.6.4")) {
 	    	log.info("1.6.4 Server version detected!");
 	    	mcpcServer = true;
-	    } else if (version.matches("1.9") || version.matches("1.9.1") || version.matches("1.9.2")) {
+	    } else if (version.matches("1.9") || version.matches("1.9.1") || version.matches("1.9.2") || version.matches("1.9.3") || version.matches("1.9.4") || version.matches("1.10")) {
 	    	is19Server = true;
 	    }
 	}

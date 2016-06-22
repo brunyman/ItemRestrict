@@ -32,9 +32,14 @@ public class Usage implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onInteract(PlayerInteractEvent event) {
 		final Player p = event.getPlayer();
-		ItemStack item = p.getItemInHand();
+		ItemStack item = null;
+		if (ir.is19Server == false) {
+			item = p.getItemInHand();
+		} else {
+			item = p.getInventory().getItemInMainHand();
+		}
 		Block interactigBlock = event.getClickedBlock();
-		
+
 		if (item.getType().isBlock() == false) {
 			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getData().getData(), p.getLocation());
 			

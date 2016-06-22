@@ -61,24 +61,26 @@ public class Creative implements Listener {
 			if (event.getSlotType() != null) {
 				if (event.getCurrentItem() != null) {
 					Player p = (Player) event.getWhoClicked();
-					ItemStack currentItem = event.getCurrentItem();
-					
-					MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, currentItem.getTypeId(), currentItem.getData().getData(), p.getLocation());
-					
-					if (bannedInfo == null) {
-						MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Creative, p, currentItem.getTypeId(), currentItem.getData().getData(), p.getLocation());
+					if (p.getGameMode() == GameMode.CREATIVE) {
+						ItemStack currentItem = event.getCurrentItem();
 						
-						if (bannedInfo2 != null) {
-							event.setCancelled(true);
+						MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, currentItem.getTypeId(), currentItem.getData().getData(), p.getLocation());
+						
+						if (bannedInfo == null) {
+							MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Creative, p, currentItem.getTypeId(), currentItem.getData().getData(), p.getLocation());
 							
-							if (ir.getConfigHandler().getBoolean("General.Sounds.onRestrictions") == true) {
-								if (ir.is19Server == true) {
-									p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
-								} else {
-									p.playSound(p.getLocation(), Sound.valueOf("ITEM_BREAK"), 1, 1);
+							if (bannedInfo2 != null) {
+								event.setCancelled(true);
+								
+								if (ir.getConfigHandler().getBoolean("General.Sounds.onRestrictions") == true) {
+									if (ir.is19Server == true) {
+										p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
+									} else {
+										p.playSound(p.getLocation(), Sound.valueOf("ITEM_BREAK"), 1, 1);
+									}
 								}
+								ir.getConfigHandler().printMessage(p, "chatMessages.creativeRestricted", bannedInfo2.reason);
 							}
-							ir.getConfigHandler().printMessage(p, "chatMessages.creativeRestricted", bannedInfo2.reason);
 						}
 					}
 				}				
