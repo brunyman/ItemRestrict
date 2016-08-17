@@ -1,5 +1,5 @@
 # default config.yml for ItemRestrict
-# config version 2.2.1
+# config version 2.2.6
 
 General:
     #Enable restrictions on all worlds. (true or false)
@@ -14,6 +14,9 @@ General:
     WorldScannerON: false
     #World Scanner scan delay in minutes. Default 1 minute.
     WorldScannerDelay: 1
+    #Remove player skulls with world scanner. (true or false)
+    RemoveSkulls: false
+    
     
     #Enable or disable sound effects.
     Sounds:

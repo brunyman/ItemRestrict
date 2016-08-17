@@ -27,7 +27,6 @@ public class WorldScanner {
 		int delay = ir.getConfigHandler().getInteger("General.WorldScannerDelay") * 60;
 		
 		BukkitTask task = Bukkit.getScheduler().runTaskTimerAsynchronously(ir, new Runnable() {
-			@SuppressWarnings("deprecation")
 			public void run() {
 				ItemRestrict.log.info("WorldScanner Task Started...");
 				ArrayList<World> worlds;
@@ -56,25 +55,14 @@ public class WorldScanner {
     								for(int y = 0; y < chunk.getWorld().getMaxHeight(); y++) {
     									for(int z = 0; z < 16; z++) {
     										final Block block = chunk.getBlock(x, y, z);
-    										MaterialData materialInfo = new MaterialData(block.getTypeId(), block.getData(), null, null);
-    										MaterialData bannedInfo = ir.worldBanned.Contains(materialInfo);
-    										if(bannedInfo != null) {
-    											Bukkit.getScheduler().runTask(ir, new Runnable() {
-													@Override
-													public void run() {
-														block.setType(Material.AIR);		
-													}
-    												
-    											});
-    											
-    											ItemRestrict.log.info("Removed " + bannedInfo.toString() + " @ " + getFriendlyLocationString(block.getLocation()));
-    										}
+    										removeBlock(block);
     									}
     								}
     							}
     						}
 						} catch(Exception e) {
 							ItemRestrict.log.warning("World Scanner Error: " + e.getMessage());
+							e.printStackTrace();
 						}
 					}
 					
@@ -88,8 +76,37 @@ public class WorldScanner {
 		ir.worldScanner.put(true, task.getTaskId());
 	}
 	
-	private static String getFriendlyLocationString(Location location) 
-	{
+	@SuppressWarnings("deprecation")
+	private void removeBlock(final Block block) {
+		MaterialData materialInfo = new MaterialData(block.getTypeId(), block.getData(), null, null);
+		MaterialData bannedInfo = ir.worldBanned.Contains(materialInfo);
+		boolean removeSkull = false;
+		if (bannedInfo == null) {
+			if (ir.getConfigHandler().getBoolean("General.RemoveSkulls") == true) {
+				if (block.getType() == Material.SKULL) {
+					removeSkull = true;
+				}
+			}
+		}
+		if (bannedInfo != null || removeSkull == true) {
+			Bukkit.getScheduler().runTask(ir, new Runnable() {
+				@Override
+				public void run() {
+					block.setType(Material.AIR);		
+				}
+				
+			});
+			String msg;
+			if (bannedInfo != null) {
+				msg = bannedInfo.toString();
+			} else {
+				msg = "skull";
+			}
+			ItemRestrict.log.info("Removed " + msg + " @ " + getFriendlyLocationString(block.getLocation()));
+		}
+	}
+	
+	private static String getFriendlyLocationString(Location location) {
 		return location.getWorld().getName() + "(" + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + ")";
 	}
 

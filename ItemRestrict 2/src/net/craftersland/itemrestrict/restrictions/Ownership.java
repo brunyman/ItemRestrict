@@ -86,17 +86,25 @@ public class Ownership implements Listener {
 			event.setCancelled(true);
 			
 			if (event.getSlotType() == SlotType.ARMOR) {
-				if (p.getInventory().getHelmet().isSimilar(currentItem)) {
-					p.getInventory().setHelmet(null);
+				if (p.getInventory().getHelmet() != null) {
+					if (p.getInventory().getHelmet().isSimilar(currentItem)) {
+						p.getInventory().setHelmet(null);
+					}
 				}
-				if (p.getInventory().getChestplate().isSimilar(currentItem)) {
-					p.getInventory().setChestplate(null);
+				if (p.getInventory().getChestplate() != null) {
+					if (p.getInventory().getChestplate().isSimilar(currentItem)) {
+						p.getInventory().setChestplate(null);
+					}
 				}
-				if (p.getInventory().getLeggings().isSimilar(currentItem)) {
-					p.getInventory().setLeggings(null);
+				if (p.getInventory().getLeggings() != null) {
+					if (p.getInventory().getLeggings().isSimilar(currentItem)) {
+						p.getInventory().setLeggings(null);
+					}
 				}
-				if (p.getInventory().getBoots().isSimilar(currentItem)) {
-					p.getInventory().setBoots(null);
+				if (p.getInventory().getBoots() != null) {
+					if (p.getInventory().getBoots().isSimilar(currentItem)) {
+						p.getInventory().setBoots(null);
+					}
 				}
 			} else if (removeCursorItem == true) {
 				p.setItemOnCursor(null);

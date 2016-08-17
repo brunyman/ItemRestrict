@@ -1,14 +1,10 @@
 package net.craftersland.itemrestrict.restrictions;
 
-import java.util.Random;
-
 import org.bukkit.Sound;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.inventory.ItemStack;
 
 import net.craftersland.itemrestrict.ItemRestrict;
 import net.craftersland.itemrestrict.RestrictedItemsHandler.ActionType;
@@ -25,37 +21,33 @@ public class Placement implements Listener {
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onInteract(BlockPlaceEvent event) {
-		if (ir.placementBanned.size() != 0) {
-			Player p = event.getPlayer();
-			ItemStack item = event.getItemInHand();
-			
-			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Placement, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+		if (ir.placementBanned.size() != 0) {	
+			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Placement, event.getPlayer(), event.getItemInHand().getTypeId(), event.getItemInHand().getData().getData(), event.getPlayer().getLocation());
 			
 			if (bannedInfo != null) {
 				event.setCancelled(true);
-				
-				int randSlot = getRandomSlot();
-				ItemStack randItem = p.getInventory().getItem(randSlot);
-				
-				p.setItemInHand(randItem);
-				p.getInventory().setItem(randSlot, item);
+				//p.getWorld().dropItem(p.getLocation(), item);
+				//p.setItemInHand(null);
 				
 				if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
 					if (ir.is19Server == true) {
-						p.playSound(p.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1, 1);
+						event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1, 1);
 					} else {
-						p.playSound(p.getLocation(), Sound.valueOf("ENDERMAN_TELEPORT"), 1, 1);
+						event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.valueOf("ENDERMAN_TELEPORT"), 1, 1);
 					}
 				}
-				ir.getConfigHandler().printMessage(p, "chatMessages.placementRestricted", bannedInfo.reason);
+				ir.getConfigHandler().printMessage(event.getPlayer(), "chatMessages.placementRestricted", bannedInfo.reason);
+			} else if (ir.is19Server == true) {
+				MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Placement, event.getPlayer(), event.getPlayer().getInventory().getItemInOffHand().getTypeId(), event.getPlayer().getInventory().getItemInOffHand().getData().getData(), event.getPlayer().getLocation());
+				if (bannedInfo2 != null) {
+					event.setCancelled(true);
+					if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
+						event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1, 1);
+					}
+					ir.getConfigHandler().printMessage(event.getPlayer(), "chatMessages.placementRestricted", bannedInfo2.reason);
+				}
 			}
 		}
-	}
-	
-	private int getRandomSlot() {
-		Random randomGenerator = new Random();
-		int randSlot = randomGenerator.nextInt(36);
-		return randSlot;
 	}
 
 }
