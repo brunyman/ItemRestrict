@@ -71,7 +71,7 @@ public class Usage implements Listener {
 					if (bannedInfo2 != null) {
 						if (isEventSafe(event.getPlayer().getName()) == false) return;
 						event.setCancelled(true);
-						Bukkit.getScheduler().runTaskLaterAsynchronously(ir, new Runnable() {
+						Bukkit.getScheduler().runTask(ir, new Runnable() {
 
 							@Override
 							public void run() {
@@ -82,7 +82,7 @@ public class Usage implements Listener {
 								p.updateInventory();
 							}
 							
-						}, 1L);
+						});
 						
 						if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
 							if (ir.is19Server == true) {
@@ -123,7 +123,7 @@ public class Usage implements Listener {
 							if (isEventSafe(event.getPlayer().getName()) == false) return;
 							event.setCancelled(true);
 							
-							Bukkit.getScheduler().runTaskLaterAsynchronously(ir, new Runnable() {
+							Bukkit.getScheduler().runTask(ir, new Runnable() {
 
 								@Override
 								public void run() {
@@ -134,7 +134,7 @@ public class Usage implements Listener {
 									p.updateInventory();
 								}
 								
-							}, 1L);
+							});
 							
 							if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
 								if (ir.is19Server == true) {
@@ -174,7 +174,7 @@ public class Usage implements Listener {
 							if (isEventSafe(event.getPlayer().getName()) == false) return;
 							event.setCancelled(true);
 							
-							Bukkit.getScheduler().runTaskLaterAsynchronously(ir, new Runnable() {
+							Bukkit.getScheduler().runTask(ir, new Runnable() {
 
 								@Override
 								public void run() {
@@ -185,7 +185,7 @@ public class Usage implements Listener {
 									p.updateInventory();
 								}
 								
-							}, 1L);
+							});
 							
 							if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
 								if (ir.is19Server == true) {
