@@ -3,7 +3,6 @@ package net.craftersland.itemrestrict.restrictions;
 import java.util.Random;
 
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,10 +29,10 @@ public class Pickup implements Listener {
 			Player p = event.getPlayer();
 			ItemStack item = event.getItem().getItemStack();
 			
-			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getDurability(), p.getLocation());
 			
 			if (bannedInfo == null) {
-				MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Pickup, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+				MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Pickup, p, item.getTypeId(), item.getDurability(), p.getLocation());
 				
 				if (bannedInfo2 != null) {
 					event.setCancelled(true);
@@ -41,13 +40,7 @@ public class Pickup implements Listener {
 					Location loc = event.getItem().getLocation();
 					event.getItem().teleport(new Location(loc.getWorld(), loc.getX() + getRandomInt(), loc.getY() + getRandomInt(), loc.getZ() + getRandomInt()));
 					
-					if (ir.getConfigHandler().getBoolean("General.Sounds.onRestrictions") == true) {
-						if (ir.is19Server == true) {
-							p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1);
-						} else {
-							p.playSound(p.getLocation(), Sound.valueOf("NOTE_PLING"), 1, 1);
-						}
-					}
+					ir.getSoundHandler().sendPlingSound(p);
 					ir.getConfigHandler().printMessage(p, "chatMessages.pickupRestricted", bannedInfo2.reason);
 				}
 			}

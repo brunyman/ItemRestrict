@@ -20,7 +20,7 @@ public class RestrictedItemsHandler {
 		this.itemrestrict = itemrestrict;
 		
 		try {
-			restrictedItemsFile = new File("plugins"+System.getProperty("file.separator")+"ItemRestrict"+System.getProperty("file.separator")+"RestrictedItems.yml");
+			restrictedItemsFile = new File("plugins" + System.getProperty("file.separator") + ItemRestrict.pluginName + System.getProperty("file.separator") + "RestrictedItems.yml");
 			
 			//Create RestrictedItems.yml and/or load it
 			if (!restrictedItemsFile.exists()) {
@@ -153,7 +153,7 @@ public class RestrictedItemsHandler {
 		}		
 	}
 	
-	public MaterialData isBanned(ActionType actionType, Player player, int typeId, byte data, Location location) {
+	public MaterialData isBanned(ActionType actionType, Player player, int typeId, short data, Location location) {
 		if (itemrestrict.getConfigHandler().getString("General.EnableOnAllWorlds") != "true") {
 			if (location != null) {
 				if(!itemrestrict.enforcementWorlds.contains(location.getWorld())) return null;

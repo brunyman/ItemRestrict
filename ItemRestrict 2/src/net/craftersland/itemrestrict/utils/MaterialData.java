@@ -3,12 +3,12 @@ package net.craftersland.itemrestrict.utils;
 public class MaterialData {
 	
 	public int typeID;
-	public byte data;
+	public short data;
 	public boolean allDataValues;
 	public String description;
 	public String reason;
 	
-	public MaterialData(int typeID, byte data, String description, String reason) {
+	public MaterialData(int typeID, short data, String description, String reason) {
 		this.typeID = typeID;
 		this.data = data;
 		this.allDataValues = false;
@@ -24,7 +24,7 @@ public class MaterialData {
 		this.reason = reason;
 	}
 	
-	private MaterialData(int typeID, byte data, boolean allDataValues, String description, String reason) {
+	private MaterialData(int typeID, short data, boolean allDataValues, String description, String reason) {
 		this.typeID = typeID;
 		this.data = data;
 		this.allDataValues = allDataValues;
@@ -51,7 +51,7 @@ public class MaterialData {
 			
 			int typeID = Integer.parseInt(parts[0]);
 			
-			byte data;
+			short data;
 			boolean allDataValues;
 			if(parts[1].equals("*"))
 			{
@@ -60,7 +60,7 @@ public class MaterialData {
 			}
 			else {
 				allDataValues = false;
-				data = (byte) Integer.parseInt(parts[1]);
+				data = Short.parseShort(parts[1]);
 			}
 			
 			return new MaterialData(typeID, data, allDataValues, parts.length >= 3 ? parts[2] : "", parts.length >= 4 ? parts[3] : "(No reason provided.)");

@@ -15,53 +15,58 @@ public class ConfigHandler {
 	
 	public ConfigHandler(final ItemRestrict ir) {
 		this.ir = ir;
-		
-		        //Create the config file
-				if (!(new File("plugins"+System.getProperty("file.separator")+"ItemRestrict"+System.getProperty("file.separator")+"config.yml").exists())) {
-					ItemRestrict.log.info("No config file found! Creating new one...");
-					ir.saveResource("config.yml", false);
-				}
-				//Load the config file
-				try {
-					ir.getConfig().load(new File("plugins"+System.getProperty("file.separator")+"ItemRestrict"+System.getProperty("file.separator")+"config.yml"));
-				} catch (Exception e) {
-					ItemRestrict.log.severe("Could not load config file! Error: " + e.getMessage());
-					e.printStackTrace();
-				}
-				
-				//Check the worlds the restrictions will take place
-				if (getString("General.EnableOnAllWorlds") == "true") {
-					//Restrictions will take place on all worlds
-					ItemRestrict.log.info("Restrictions enabled on all worlds.");
-				} else {
-					getWorldsTask();				
-				}
-				
+		loadConfig();
 	}
 	
-	//Read config data
+	public void loadConfig() {
+		File pluginFolder = new File("plugins" + System.getProperty("file.separator") + ItemRestrict.pluginName);
+		if (pluginFolder.exists() == false) {
+    		pluginFolder.mkdir();
+    	}
+		File configFile = new File("plugins" + System.getProperty("file.separator") + ItemRestrict.pluginName + System.getProperty("file.separator") + "config.yml");
+		if (configFile.exists() == false) {
+			ItemRestrict.log.info("No config file found! Creating new one...");
+			ir.saveDefaultConfig();
+		}
+    	try {
+    		ItemRestrict.log.info("Loading the config file...");
+    		ir.getConfig().load(configFile);
+    	} catch (Exception e) {
+    		ItemRestrict.log.severe("Could not load the config file! You need to regenerate the config! Error: " + e.getMessage());
+			e.printStackTrace();
+    	}
+    	if (getBoolean("General.EnableOnAllWorlds") == true) {
+    		ItemRestrict.log.info("Restrictions enabled on all worlds.");
+    	} else {
+    		getWorldsTask();
+    	}
+	}
+	
 	public String getString(String key) {
 		if (!ir.getConfig().contains(key)) {
-			ir.getLogger().severe("Could not locate '"+key+"' in the config.yml inside of the ItemRestrict folder! (Try generating a new one by deleting the current)");
-			return "Error could not locate in config:"+key;
-		}
+			ir.getLogger().severe("Could not locate " + key + " in the config.yml inside of the " + ItemRestrict.pluginName + " folder! (Try generating a new one by deleting the current)");
+			return "errorCouldNotLocateInConfigYml:" + key;
+		} else {
 			return ir.getConfig().getString(key);
+		}
 	}
 	
 	public Integer getInteger(String key) {
 		if (!ir.getConfig().contains(key)) {
-			ir.getLogger().severe("Could not locate '"+key+"' in the config.yml inside of the ItemRestrict folder! (Try generating a new one by deleting the current)");
+			ir.getLogger().severe("Could not locate " + key + " in the config.yml inside of the " + ItemRestrict.pluginName + " folder! (Try generating a new one by deleting the current)");
 			return null;
-		}
+		} else {
 			return ir.getConfig().getInt(key);
+		}
 	}
 	
 	public Boolean getBoolean(String key) {
 		if (!ir.getConfig().contains(key)) {
-			ir.getLogger().severe("Could not locate '"+key+"' in the config.yml inside of the ItemRestrict folder! (Try generating a new one by deleting the current)");
+			ir.getLogger().severe("Could not locate " + key + " in the config.yml inside of the " + ItemRestrict.pluginName + " folder! (Try generating a new one by deleting the current)");
 			return null;
-		}
+		} else {
 			return ir.getConfig().getBoolean(key);
+		}
 	}
 	
 	//Send chat messages from config

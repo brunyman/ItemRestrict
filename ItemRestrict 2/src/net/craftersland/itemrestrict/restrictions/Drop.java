@@ -1,6 +1,5 @@
 package net.craftersland.itemrestrict.restrictions;
 
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,21 +26,15 @@ public class Drop implements Listener {
 			Player p = event.getPlayer();
 			ItemStack item = event.getItemDrop().getItemStack();
 			
-			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getDurability(), p.getLocation());
 			
 			if (bannedInfo == null) {
-				MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Drop, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+				MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Drop, p, item.getTypeId(), item.getDurability(), p.getLocation());
 				
 				if (bannedInfo2 != null) {
 					event.setCancelled(true);
 					
-					if (ir.getConfigHandler().getBoolean("General.Sounds.onRestrictions") == true) {
-						if (ir.is19Server == true) {
-							p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1);
-						} else {
-							p.playSound(p.getLocation(), Sound.valueOf("NOTE_PLING"), 1, 1);
-						}
-					}
+					ir.getSoundHandler().sendPlingSound(p);
 					ir.getConfigHandler().printMessage(p, "chatMessages.dropingRestricted", bannedInfo2.reason);
 				}
 			}

@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -63,10 +62,10 @@ public class Usage implements Listener {
 
 		if (item.getType().isBlock() == false) {
 			if (ir.is19Server == false) {
-				MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+				MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getDurability(), p.getLocation());
 				
 				if (bannedInfo == null) {
-					MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+					MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getDurability(), p.getLocation());
 					
 					if (bannedInfo2 != null) {
 						if (isEventSafe(event.getPlayer().getName()) == false) return;
@@ -84,13 +83,7 @@ public class Usage implements Listener {
 							
 						});
 						
-						if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
-							if (ir.is19Server == true) {
-								p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1);
-							} else {
-								p.playSound(p.getLocation(), Sound.valueOf("NOTE_PLING"), 1, 1);
-							}
-						}
+						ir.getSoundHandler().sendPlingSound(p);
 						ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo2.reason);
 					} else if (interactigBlock != null) {
 						if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -100,13 +93,7 @@ public class Usage implements Listener {
 								if (isEventSafe(event.getPlayer().getName()) == false) return;
 								event.setCancelled(true);
 								
-								if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
-									if (ir.is19Server == true) {
-										p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1);
-									} else {
-										p.playSound(p.getLocation(), Sound.valueOf("NOTE_PLING"), 1, 1);
-									}
-								}
+								ir.getSoundHandler().sendPlingSound(p);
 								ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo3.reason);
 							}
 						}
@@ -114,10 +101,10 @@ public class Usage implements Listener {
 				}
 			} else {
 				if (item.getType() != Material.AIR) {
-					MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+					MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getDurability(), p.getLocation());
 					
 					if (bannedInfo == null) {
-						MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+						MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getDurability(), p.getLocation());
 						
 						if (bannedInfo2 != null) {
 							if (isEventSafe(event.getPlayer().getName()) == false) return;
@@ -136,13 +123,7 @@ public class Usage implements Listener {
 								
 							});
 							
-							if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
-								if (ir.is19Server == true) {
-									p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1);
-								} else {
-									p.playSound(p.getLocation(), Sound.valueOf("NOTE_PLING"), 1, 1);
-								}
-							}
+							ir.getSoundHandler().sendPlingSound(p);
 							ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo2.reason);
 						} else if (interactigBlock != null) {
 							if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -152,23 +133,17 @@ public class Usage implements Listener {
 									if (isEventSafe(event.getPlayer().getName()) == false) return;
 									event.setCancelled(true);
 									
-									if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
-										if (ir.is19Server == true) {
-											p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1);
-										} else {
-											p.playSound(p.getLocation(), Sound.valueOf("NOTE_PLING"), 1, 1);
-										}
-									}
+									ir.getSoundHandler().sendPlingSound(p);
 									ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo3.reason);
 								}
 							}
 						}
 					}
 				} else {
-					MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item2.getTypeId(), item2.getData().getData(), p.getLocation());
+					MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item2.getTypeId(), item2.getDurability(), p.getLocation());
 					
 					if (bannedInfo == null) {
-						MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item2.getTypeId(), item2.getData().getData(), p.getLocation());
+						MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item2.getTypeId(), item2.getDurability(), p.getLocation());
 						
 						if (bannedInfo2 != null) {
 							if (isEventSafe(event.getPlayer().getName()) == false) return;
@@ -187,13 +162,7 @@ public class Usage implements Listener {
 								
 							});
 							
-							if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
-								if (ir.is19Server == true) {
-									p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1);
-								} else {
-									p.playSound(p.getLocation(), Sound.valueOf("NOTE_PLING"), 1, 1);
-								}
-							}
+							ir.getSoundHandler().sendPlingSound(p);
 							ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo2.reason);
 						} else if (interactigBlock != null) {
 							if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -202,13 +171,7 @@ public class Usage implements Listener {
 								if (bannedInfo3 != null) {
 									event.setCancelled(true);
 									
-									if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
-										if (ir.is19Server == true) {
-											p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1);
-										} else {
-											p.playSound(p.getLocation(), Sound.valueOf("NOTE_PLING"), 1, 1);
-										}
-									}
+									ir.getSoundHandler().sendPlingSound(p);
 									ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo3.reason);
 								}
 							}
@@ -224,13 +187,7 @@ public class Usage implements Listener {
 					if (bannedInfo2 != null) {
 						event.setCancelled(true);
 						
-						if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
-							if (ir.is19Server == true) {
-								p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1);
-							} else {
-								p.playSound(p.getLocation(), Sound.valueOf("NOTE_PLING"), 1, 1);
-							}
-						}
+						ir.getSoundHandler().sendPlingSound(p);
 						ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo2.reason);
 					}
 				}
@@ -247,23 +204,17 @@ public class Usage implements Listener {
 		
 		if (item != null) {
 			if (item.getType().isBlock() == false) {
-				MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+				MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getDurability(), p.getLocation());
 				
 				if (bannedInfo == null) {
-					MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+					MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getDurability(), p.getLocation());
 					
 					if (bannedInfo2 != null) {
 						p.getWorld().dropItem(p.getLocation(), item);
 						p.getInventory().setItem(newSlot, null);
 						p.updateInventory();
 						
-						if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
-							if (ir.is19Server == true) {
-								p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1);
-							} else {
-								p.playSound(p.getLocation(), Sound.valueOf("NOTE_PLING"), 1, 1);
-							}
-						}
+						ir.getSoundHandler().sendPlingSound(p);
 						ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo2.reason);
 					}
 				}
@@ -277,7 +228,7 @@ public class Usage implements Listener {
 		if (event.getDamager() instanceof Player) {
 			Player p = (Player) event.getDamager();
 			ItemStack item = p.getItemInHand();
-			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getDurability(), p.getLocation());
 			
 			if (bannedInfo != null) {
 				event.setCancelled(true);
@@ -288,7 +239,7 @@ public class Usage implements Listener {
 				if (pr.getShooter() instanceof Player) {
 					Player p = (Player) pr.getShooter();
 					ItemStack item = p.getItemInHand();
-					MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+					MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getDurability(), p.getLocation());
 					
 					if (bannedInfo != null) {
 						event.setCancelled(true);

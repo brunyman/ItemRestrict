@@ -4,7 +4,6 @@ import net.craftersland.itemrestrict.ItemRestrict;
 import net.craftersland.itemrestrict.RestrictedItemsHandler.ActionType;
 import net.craftersland.itemrestrict.utils.MaterialData;
 
-import org.bukkit.Sound;
 import org.bukkit.block.Furnace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,22 +28,16 @@ public class Smelting implements Listener {
 		if (f.getInventory().getViewers().isEmpty() == false) {
 			Player p = (Player) f.getInventory().getViewers().get(0);
 			
-			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Smelting, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Smelting, p, item.getTypeId(), item.getDurability(), p.getLocation());
 			
 			if (bannedInfo != null) {
 				event.setCancelled(true);
 				
-				if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
-					if (ir.is19Server == true) {
-						p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1);
-					} else {
-						p.playSound(p.getLocation(), Sound.valueOf("NOTE_PLING"), 1, 1);
-					}
-				}
+				ir.getSoundHandler().sendPlingSound(p);
 				ir.getConfigHandler().printMessage(p, "chatMessages.smeltingRestricted", bannedInfo.reason);
 			}
 		} else {
-            MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Smelting, null, item.getTypeId(), item.getData().getData(), null);
+            MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Smelting, null, item.getTypeId(), item.getDurability(), null);
 			
 			if (bannedInfo != null) {
 				event.setCancelled(true);

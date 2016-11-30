@@ -1,7 +1,6 @@
 package net.craftersland.itemrestrict.restrictions;
 
 import org.bukkit.GameMode;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,22 +30,16 @@ public class Creative implements Listener {
 			
 			if (cursorItem != null) {
 				Player p = (Player) event.getWhoClicked();
-				MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, cursorItem.getTypeId(), cursorItem.getData().getData(), p.getLocation());
+				MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, cursorItem.getTypeId(), cursorItem.getDurability(), p.getLocation());
 				
 				if (bannedInfo == null) {
-					MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Creative, p, cursorItem.getTypeId(), cursorItem.getData().getData(), p.getLocation());
+					MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Creative, p, cursorItem.getTypeId(), cursorItem.getDurability(), p.getLocation());
 					
 					if (bannedInfo2 != null) {
 						event.setCancelled(true);
 						event.setCursor(null);
 						
-						if (ir.getConfigHandler().getBoolean("General.Sounds.onRestrictions") == true) {
-							if (ir.is19Server == true) {
-								p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
-							} else {
-								p.playSound(p.getLocation(), Sound.valueOf("ITEM_BREAK"), 1, 1);
-							}
-						}
+						ir.getSoundHandler().sendItemBreakSound(p);
 						ir.getConfigHandler().printMessage(p, "chatMessages.creativeRestricted", bannedInfo2.reason);
 					}
 				}
@@ -64,21 +57,15 @@ public class Creative implements Listener {
 					if (p.getGameMode() == GameMode.CREATIVE) {
 						ItemStack currentItem = event.getCurrentItem();
 						
-						MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, currentItem.getTypeId(), currentItem.getData().getData(), p.getLocation());
+						MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, currentItem.getTypeId(), currentItem.getDurability(), p.getLocation());
 						
 						if (bannedInfo == null) {
-							MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Creative, p, currentItem.getTypeId(), currentItem.getData().getData(), p.getLocation());
+							MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Creative, p, currentItem.getTypeId(), currentItem.getDurability(), p.getLocation());
 							
 							if (bannedInfo2 != null) {
 								event.setCancelled(true);
 								
-								if (ir.getConfigHandler().getBoolean("General.Sounds.onRestrictions") == true) {
-									if (ir.is19Server == true) {
-										p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
-									} else {
-										p.playSound(p.getLocation(), Sound.valueOf("ITEM_BREAK"), 1, 1);
-									}
-								}
+								ir.getSoundHandler().sendItemBreakSound(p);
 								ir.getConfigHandler().printMessage(p, "chatMessages.creativeRestricted", bannedInfo2.reason);
 							}
 						}
@@ -96,21 +83,15 @@ public class Creative implements Listener {
 		if (p.getGameMode() == GameMode.CREATIVE) {
 			ItemStack item = p.getItemInHand();
 			
-			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+			MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getDurability(), p.getLocation());
 			
 			if (bannedInfo == null) {
-				MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Creative, p, item.getTypeId(), item.getData().getData(), p.getLocation());
+				MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Creative, p, item.getTypeId(), item.getDurability(), p.getLocation());
 				
 				if (bannedInfo2 != null) {
 					event.setCancelled(true);
 					
-					if (ir.getConfigHandler().getBoolean("General.Sounds.onRestrictions") == true) {
-						if (ir.is19Server == true) {
-							p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
-						} else {
-							p.playSound(p.getLocation(), Sound.valueOf("ITEM_BREAK"), 1, 1);
-						}
-					}
+					ir.getSoundHandler().sendItemBreakSound(p);
 					ir.getConfigHandler().printMessage(p, "chatMessages.creativeRestricted", bannedInfo2.reason);
 				}
 			}

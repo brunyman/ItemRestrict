@@ -1,7 +1,6 @@
 package net.craftersland.itemrestrict.restrictions;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -229,13 +228,7 @@ public class Brewing implements Listener {
 						player.getInventory().addItem(new ItemStack(ingredient.getType(), 1));
 					}
 					ir.getConfigHandler().printMessage(player, "chatMessages.brewingRestricted", reason);
-					if (ir.getConfigHandler().getString("General.Sounds.onRestrictions").matches("true")) {
-						if (ir.is19Server == true) {
-							player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 1);
-						} else {
-							player.playSound(player.getLocation(), Sound.valueOf("NOTE_PLING"), 1, 1);
-						}
-					}
+					ir.getSoundHandler().sendPlingSound(player);
 				}
 				
 			}

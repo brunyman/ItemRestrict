@@ -24,6 +24,7 @@ import net.craftersland.itemrestrict.utils.WorldScanner;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,7 +32,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ItemRestrict extends JavaPlugin {
 	
 	public static Logger log;
-	public static ItemRestrict itemRestrict;
+	public static String pluginName = "ItemRestrict";
 	
 	public ArrayList<World> enforcementWorlds = new ArrayList<World>();
 	public MaterialCollection ownershipBanned = new MaterialCollection();
@@ -52,13 +53,14 @@ public class ItemRestrict extends JavaPlugin {
 	public Map<Boolean, Integer> wearingScanner = new HashMap<Boolean, Integer>();
 	
 	public boolean mcpcServer = false;
-	public boolean is19Server = false;
+	public boolean is19Server = true;
 	
-	private ConfigHandler configHandler;
-	private RestrictedItemsHandler restrictedHandler;
-	private WorldScanner ws;
-	private WearingScanner es;
-	private DisableRecipe ds;
+	private static ConfigHandler configHandler;
+	private static RestrictedItemsHandler restrictedHandler;
+	private static WorldScanner ws;
+	private static WearingScanner es;
+	private static DisableRecipe ds;
+	private static SoundHandler sH;
 	
 	public void onEnable() {
 		log = getLogger();
@@ -77,6 +79,7 @@ public class ItemRestrict extends JavaPlugin {
         ws = new WorldScanner(this);
         es = new WearingScanner(this);
         ds = new DisableRecipe(this);
+        sH = new SoundHandler(this);
         
         //Register Listeners
     	PluginManager pm = getServer().getPluginManager();
@@ -106,7 +109,7 @@ public class ItemRestrict extends JavaPlugin {
     		ws.worldScanTask();
 		}
     	
-    	log.info("ItemRestrict has been successfully loaded!");
+    	log.info(pluginName + " loaded successfully!");
 	}
 	
 	public void onReload() {
@@ -157,7 +160,9 @@ public class ItemRestrict extends JavaPlugin {
 	}
 	
 	public void onDisable() {
-		log.info("ItemRestrict has been disabled.");
+		Bukkit.getScheduler().cancelTasks(this);
+		HandlerList.unregisterAll(this);
+		log.info(pluginName + " is disabled!");
 	}
 	
 	private void printConsoleStatus() {
@@ -196,11 +201,12 @@ public class ItemRestrict extends JavaPlugin {
 	private void checkServerVersion() {
 		String[] serverVersion = Bukkit.getBukkitVersion().split("-");
 	    String version = serverVersion[0];
+	    log.info("Server version detected: " + version);
 	    if (version.matches("1.6.4")) {
-	    	log.info("1.6.4 Server version detected!");
 	    	mcpcServer = true;
-	    } else if (version.matches("1.9") || version.matches("1.9.1") || version.matches("1.9.2") || version.matches("1.9.3") || version.matches("1.9.4") || version.matches("1.10") || version.matches("1.10.2")) {
-	    	is19Server = true;
+	    	is19Server = false;
+	    } else if (version.matches("1.7.10") || version.matches("1.8") || version.matches("1.8.3") || version.matches("1.8.8") || version.matches("1.8.7") || version.matches("1.8.6") || version.matches("1.8.5") || version.matches("1.8.4")) {
+	    	is19Server = false;
 	    }
 	}
 	
@@ -213,6 +219,9 @@ public class ItemRestrict extends JavaPlugin {
 	}
 	public DisableRecipe getDisableRecipe() {
 		return ds;
+	}
+	public SoundHandler getSoundHandler() {
+		return sH;
 	}
 
 }

@@ -49,7 +49,7 @@ public class DisableRecipe {
 							if (s1[1].contains("*") == true) {
 								is = new ItemStack(m);
 							} else {
-								Byte b = Byte.parseByte(s1[1]);
+								short b = Short.parseShort(s1[1]);
 								is = new ItemStack(m, 1, b);
 							}
 							
@@ -69,7 +69,7 @@ public class DisableRecipe {
 							if (s1[1].contains("*") == true) {
 								is = new ItemStack(m);
 							} else {
-								Byte b = Byte.parseByte(s1[1]);
+								short b = Short.parseShort(s1[1]);
 								is = new ItemStack(m, 1, b);
 							}
 							
