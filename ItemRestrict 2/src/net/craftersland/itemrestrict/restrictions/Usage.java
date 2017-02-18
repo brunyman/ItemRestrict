@@ -66,7 +66,7 @@ public class Usage implements Listener {
 				
 				if (bannedInfo == null) {
 					MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getDurability(), p.getLocation());
-					
+					MaterialData bannedInfo2Off = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item2.getTypeId(), item2.getDurability(), p.getLocation());
 					if (bannedInfo2 != null) {
 						if (isEventSafe(event.getPlayer().getName()) == false) return;
 						event.setCancelled(true);
@@ -85,6 +85,24 @@ public class Usage implements Listener {
 						
 						ir.getSoundHandler().sendPlingSound(p);
 						ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo2.reason);
+					} else if (bannedInfo2Off != null) {
+						if (isEventSafe(event.getPlayer().getName()) == false) return;
+						event.setCancelled(true);
+						Bukkit.getScheduler().runTask(ir, new Runnable() {
+
+							@Override
+							public void run() {
+								ItemStack handItem = p.getInventory().getItemInOffHand();
+								p.getWorld().dropItem(p.getLocation(), handItem);
+								p.getInventory().setItemInOffHand(null);
+								p.closeInventory();
+								p.updateInventory();
+							}
+							
+						});
+						
+						ir.getSoundHandler().sendPlingSound(p);
+						ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo2Off.reason);
 					} else if (interactigBlock != null) {
 						if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 							MaterialData bannedInfo3 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, interactigBlock.getTypeId(), interactigBlock.getData(), p.getLocation());
