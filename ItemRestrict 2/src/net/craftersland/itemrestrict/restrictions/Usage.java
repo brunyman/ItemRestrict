@@ -4,14 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -55,20 +53,25 @@ public class Usage implements Listener {
 		if (ir.is19Server == false) {
 			item = p.getItemInHand();
 		} else {
+			if (isEventSafe(event.getPlayer().getName()) == false) return;
 			item = p.getInventory().getItemInMainHand();
 			item2 = p.getInventory().getItemInOffHand();
 		}
 		Block interactigBlock = event.getClickedBlock();
+		MaterialData bannedInfoInteractingBlock = null;
+		if (interactigBlock != null) {
+			bannedInfoInteractingBlock = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, interactigBlock.getTypeId(), interactigBlock.getData(), p.getLocation());
+		}
 
-		if (item.getType().isBlock() == false) {
-			if (ir.is19Server == false) {
-				MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getDurability(), p.getLocation());
-				
-				if (bannedInfo == null) {
-					MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getDurability(), p.getLocation());
-					MaterialData bannedInfo2Off = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item2.getTypeId(), item2.getDurability(), p.getLocation());
-					if (bannedInfo2 != null) {
-						if (isEventSafe(event.getPlayer().getName()) == false) return;
+		if (bannedInfoInteractingBlock != null) {
+			event.setCancelled(true);
+			ir.getSoundHandler().sendPlingSound(p);
+			ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfoInteractingBlock.reason);
+		} else if (ir.is19Server == false) {
+			if (event.isBlockInHand() == false) {
+				if (ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getDurability(), p.getLocation()) == null) {
+					MaterialData bannedInfoMainHand = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getDurability(), p.getLocation());
+					if (bannedInfoMainHand != null) {
 						event.setCancelled(true);
 						Bukkit.getScheduler().runTask(ir, new Runnable() {
 
@@ -84,9 +87,36 @@ public class Usage implements Listener {
 						});
 						
 						ir.getSoundHandler().sendPlingSound(p);
-						ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo2.reason);
-					} else if (bannedInfo2Off != null) {
-						if (isEventSafe(event.getPlayer().getName()) == false) return;
+						ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfoMainHand.reason);
+					}
+				}
+			}
+		} else if (ir.is19Server == true) {
+			if (event.isBlockInHand() == false) {
+				if (ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getDurability(), p.getLocation()) == null) {
+					MaterialData bannedInfoMainHand = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getDurability(), p.getLocation());
+					if (bannedInfoMainHand != null) {
+						event.setCancelled(true);
+						Bukkit.getScheduler().runTask(ir, new Runnable() {
+
+							@Override
+							public void run() {
+								ItemStack handItem = p.getInventory().getItemInMainHand();
+								p.getWorld().dropItem(p.getLocation(), handItem);
+								p.getInventory().setItemInMainHand(null);
+								p.closeInventory();
+								p.updateInventory();
+							}
+							
+						});
+						
+						ir.getSoundHandler().sendPlingSound(p);
+						ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfoMainHand.reason);
+					}
+				}
+				if (ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getDurability(), p.getLocation()) == null) {
+					MaterialData bannedInfoOffHand = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item2.getTypeId(), item2.getDurability(), p.getLocation());
+					if (bannedInfoOffHand != null) {
 						event.setCancelled(true);
 						Bukkit.getScheduler().runTask(ir, new Runnable() {
 
@@ -102,111 +132,7 @@ public class Usage implements Listener {
 						});
 						
 						ir.getSoundHandler().sendPlingSound(p);
-						ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo2Off.reason);
-					} else if (interactigBlock != null) {
-						if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-							MaterialData bannedInfo3 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, interactigBlock.getTypeId(), interactigBlock.getData(), p.getLocation());
-							
-							if (bannedInfo3 != null) {
-								if (isEventSafe(event.getPlayer().getName()) == false) return;
-								event.setCancelled(true);
-								
-								ir.getSoundHandler().sendPlingSound(p);
-								ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo3.reason);
-							}
-						}
-					}
-				}
-			} else {
-				if (item.getType() != Material.AIR) {
-					MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item.getTypeId(), item.getDurability(), p.getLocation());
-					
-					if (bannedInfo == null) {
-						MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item.getTypeId(), item.getDurability(), p.getLocation());
-						
-						if (bannedInfo2 != null) {
-							if (isEventSafe(event.getPlayer().getName()) == false) return;
-							event.setCancelled(true);
-							
-							Bukkit.getScheduler().runTask(ir, new Runnable() {
-
-								@Override
-								public void run() {
-									ItemStack handItem = p.getInventory().getItemInMainHand();
-									p.getWorld().dropItem(p.getLocation(), handItem);
-									p.getInventory().setItemInMainHand(null);
-									p.closeInventory();
-									p.updateInventory();
-								}
-								
-							});
-							
-							ir.getSoundHandler().sendPlingSound(p);
-							ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo2.reason);
-						} else if (interactigBlock != null) {
-							if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-								MaterialData bannedInfo3 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, interactigBlock.getTypeId(), interactigBlock.getData(), p.getLocation());
-								
-								if (bannedInfo3 != null) {
-									if (isEventSafe(event.getPlayer().getName()) == false) return;
-									event.setCancelled(true);
-									
-									ir.getSoundHandler().sendPlingSound(p);
-									ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo3.reason);
-								}
-							}
-						}
-					}
-				} else {
-					MaterialData bannedInfo = ir.getRestrictedItemsHandler().isBanned(ActionType.Ownership, p, item2.getTypeId(), item2.getDurability(), p.getLocation());
-					
-					if (bannedInfo == null) {
-						MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, item2.getTypeId(), item2.getDurability(), p.getLocation());
-						
-						if (bannedInfo2 != null) {
-							if (isEventSafe(event.getPlayer().getName()) == false) return;
-							event.setCancelled(true);
-							
-							Bukkit.getScheduler().runTask(ir, new Runnable() {
-
-								@Override
-								public void run() {
-									ItemStack handItem = p.getInventory().getItemInOffHand();
-									p.getWorld().dropItem(p.getLocation(), handItem);
-									p.getInventory().setItemInOffHand(null);
-									p.closeInventory();
-									p.updateInventory();
-								}
-								
-							});
-							
-							ir.getSoundHandler().sendPlingSound(p);
-							ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo2.reason);
-						} else if (interactigBlock != null) {
-							if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-								MaterialData bannedInfo3 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, interactigBlock.getTypeId(), interactigBlock.getData(), p.getLocation());
-								
-								if (bannedInfo3 != null) {
-									event.setCancelled(true);
-									
-									ir.getSoundHandler().sendPlingSound(p);
-									ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo3.reason);
-								}
-							}
-						}
-					}
-				}
-			}
-		} else if (item.getType().isBlock() == true) {
-			if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-				if (interactigBlock != null) {
-					MaterialData bannedInfo2 = ir.getRestrictedItemsHandler().isBanned(ActionType.Usage, p, interactigBlock.getTypeId(), interactigBlock.getData(), p.getLocation());
-					
-					if (bannedInfo2 != null) {
-						event.setCancelled(true);
-						
-						ir.getSoundHandler().sendPlingSound(p);
-						ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfo2.reason);
+						ir.getConfigHandler().printMessage(p, "chatMessages.ussageRestricted", bannedInfoOffHand.reason);
 					}
 				}
 			}
