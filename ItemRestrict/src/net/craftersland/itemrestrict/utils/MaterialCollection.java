@@ -1,10 +1,11 @@
-package net.craftersland.itemrestrict.itemsprocessor;
+package net.craftersland.itemrestrict.utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MaterialCollection {
 	
-	ArrayList<MaterialData> materials = new ArrayList<MaterialData>();
+	List<MaterialData> materials = new ArrayList<MaterialData>();
 	
 	public void Add(MaterialData material)
 	{
