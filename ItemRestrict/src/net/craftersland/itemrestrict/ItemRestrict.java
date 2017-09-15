@@ -2,49 +2,73 @@ package net.craftersland.itemrestrict;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
-import net.craftersland.itemrestrict.RestrictedItemsHandler.ActionType;
-import net.craftersland.itemrestrict.itemsprocessor.MaterialCollection;
-import net.craftersland.itemrestrict.itemsprocessor.MaterialData;
+import net.craftersland.itemrestrict.restrictions.BlockBreak;
+import net.craftersland.itemrestrict.restrictions.Brewing;
+import net.craftersland.itemrestrict.restrictions.Crafting;
+import net.craftersland.itemrestrict.restrictions.Creative;
+import net.craftersland.itemrestrict.restrictions.Drop;
+import net.craftersland.itemrestrict.restrictions.OffHandSwap;
+import net.craftersland.itemrestrict.restrictions.Ownership;
+import net.craftersland.itemrestrict.restrictions.Pickup;
+import net.craftersland.itemrestrict.restrictions.Placement;
+import net.craftersland.itemrestrict.restrictions.Smelting;
+import net.craftersland.itemrestrict.restrictions.Usage;
+import net.craftersland.itemrestrict.utils.DisableRecipe;
+import net.craftersland.itemrestrict.utils.MaterialCollection;
+import net.craftersland.itemrestrict.utils.WearingScanner;
+import net.craftersland.itemrestrict.utils.WorldScanner;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ItemRestrict extends JavaPlugin {
-	//for logging to the console and log file
+	
 	public static Logger log;
-	public static ItemRestrict itemrestrict;
+	public static String pluginName = "ItemRestrict";
 	
 	public ArrayList<World> enforcementWorlds = new ArrayList<World>();
 	public MaterialCollection ownershipBanned = new MaterialCollection();
 	public MaterialCollection craftingBanned = new MaterialCollection();
+	public MaterialCollection smeltingBanned = new MaterialCollection();
+	public List<String> craftingDisabled = new ArrayList<String>();
+	public List<String> smeltingDisabled = new ArrayList<String>();
+	public List<Recipe> disabledRecipes = new ArrayList<Recipe>();
 	public MaterialCollection brewingBanned = new MaterialCollection();
 	public MaterialCollection wearingBanned = new MaterialCollection();
 	public MaterialCollection creativeBanned = new MaterialCollection();
 	public MaterialCollection usageBanned = new MaterialCollection();
 	public MaterialCollection placementBanned = new MaterialCollection();
+	public MaterialCollection blockBreakBanned = new MaterialCollection();
+	public MaterialCollection pickupBanned = new MaterialCollection();
+	public MaterialCollection dropBanned = new MaterialCollection();
 	public MaterialCollection worldBanned = new MaterialCollection();
+	public Map<Boolean, Integer> worldScanner = new HashMap<Boolean, Integer>();
+	public Map<Boolean, Integer> wearingScanner = new HashMap<Boolean, Integer>();
 	
-	private ConfigHandler configHandler;
-	private RestrictedItemsHandler restrictedHandler;
-	private MaterialData materialData;
-	private MaterialCollection materialCollection;
-	private int nextChunkPercentile = 0;
+	public boolean mcpcServer = false;
+	public boolean is19Server = true;
 	
+	private static ConfigHandler configHandler;
+	private static RestrictedItemsHandler restrictedHandler;
+	private static WorldScanner ws;
+	private static WearingScanner es;
+	private static DisableRecipe ds;
+	private static SoundHandler sH;
 	
 	public void onEnable() {
 		log = getLogger();
-		log.info("Loading ItemRestrict v" + getDescription().getVersion() + "...");
+		checkServerVersion();
+		worldScanner.put(false, 0);
+		wearingScanner.put(false, 0);
 		
 		//Create ItemRestrict plugin folder
     	(new File("plugins"+System.getProperty("file.separator")+"ItemRestrict")).mkdir();
@@ -53,93 +77,42 @@ public class ItemRestrict extends JavaPlugin {
         configHandler = new ConfigHandler(this);
         //Load Restricted Items
         restrictedHandler = new RestrictedItemsHandler(this);
+        //Load Classes
+        ws = new WorldScanner(this);
+        es = new WearingScanner(this);
+        ds = new DisableRecipe(this);
+        sH = new SoundHandler(this);
         
         //Register Listeners
     	PluginManager pm = getServer().getPluginManager();
-    	pm.registerEvents(new PlayerHandler(this), this);
-    	pm.registerEvents(new EventsHandler(this), this);
+    	pm.registerEvents(new Ownership(this), this);
+    	pm.registerEvents(new Crafting(this), this);
+    	pm.registerEvents(new Smelting(this), this);
+    	pm.registerEvents(new Brewing(this), this);
+    	pm.registerEvents(new Creative(this), this);
+    	pm.registerEvents(new Usage(this), this);
+    	pm.registerEvents(new Placement(this), this);
+    	pm.registerEvents(new BlockBreak(this), this);
+    	pm.registerEvents(new Pickup(this), this);
+    	pm.registerEvents(new Drop(this), this);
+    	if (is19Server == true) {
+    		pm.registerEvents(new OffHandSwap(this), this);
+    	}
     	CommandHandler cH = new CommandHandler(this);
     	getCommand("itemrestrict").setExecutor(cH);
     	
-    	if (configHandler.getString("General.Restrictions.EnableBrewingBans").matches("true")) {
-    		log.info("Brewing restrictions enabled!");
-    	} else {
-    		log.info("Brewing restrictions disabled!");
-    	}
-    	if (configHandler.getString("General.Restrictions.ArmorWearingBans").matches("true")) {
-    		log.info("Wearing restrictions enabled!");
-    		wearingRestrictions();
-    	} else {
-    		log.info("Wearing restrictions disabled!");
-    	}
+    	printConsoleStatus();
     	
-    	if (configHandler.getString("General.WorldScannerON") == "true") {
-    		log.info("WorldScanner is enabled.");
-    		//start the repeating scan for banned items in loaded chunks
-    		//runs every minute and scans 5% of loaded chunks.
-    		Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
-    			@SuppressWarnings("deprecation")
-				public void run() {
-    				log.info("WorldScanner Task Started...");
-    				ArrayList<World> worlds;
-    				if(worldBanned.size() > 0) {
-    					if (enforcementWorlds.size() == 0) {
-    						worlds = (ArrayList<World>) getServer().getWorlds();
-    					} else {
-    						worlds = enforcementWorlds;
-    					}
-    					
-    					for(int i = 0; i < worlds.size(); i++) {
-    						World world = worlds.get(i);
-    						try {
-    							Chunk [] chunks = world.getLoadedChunks();
-    							
-    							//scan 5% of chunks each pass
-        						int firstChunk = (int)(chunks.length * (nextChunkPercentile / 100f));
-        						int lastChunk = (int)(chunks.length * ((nextChunkPercentile + 5) / 100f));
-        						
-        						//for each chunk to be scanned
-        						for(int j = firstChunk; j < lastChunk; j++) {
-        							Chunk chunk = chunks[j];
-        							
-        							//scan all its blocks for removable blocks
-        							for(int x = 0; x < 16; x++) {
-        								for(int y = 0; y < chunk.getWorld().getMaxHeight(); y++) {
-        									for(int z = 0; z < 16; z++) {
-        										final Block block = chunk.getBlock(x, y, z);
-        										MaterialData materialInfo = new MaterialData(block.getTypeId(), block.getData(), null, null);
-        										MaterialData bannedInfo = worldBanned.Contains(materialInfo);
-        										if(bannedInfo != null) {
-        											Bukkit.getScheduler().runTask(ItemRestrict.this, new Runnable() {
-    													@Override
-    													public void run() {
-    														block.setType(Material.AIR);		
-    													}
-        												
-        											});
-        											
-        											ItemRestrict.log.info("Removed " + bannedInfo.toString() + " @ " + getFriendlyLocationString(block.getLocation()));
-        										}
-        									}
-        								}
-        							}
-        						}
-    						} catch(Exception e) {
-    							
-    						}
-    					}
-    					
-    					nextChunkPercentile += 5;
-    					if(nextChunkPercentile >= 100) nextChunkPercentile = 0;
-    					log.info("WorldScanner Task Ended.");
-    				}
-    			}
-    		}, 20L * 60, 20L * 60);
-		} else {
-			log.info("WorldScanner is disabled.");
+    	if (configHandler.getBoolean("General.Restrictions.ArmorWearingBans") == true) {
+    		//Start the wearing scanner task
+    		es.wearingScanTask();
+    	}
+    	if (configHandler.getBoolean("General.WorldScannerON") == true) {
+    		//Start the world scanner task
+    		ws.worldScanTask();
 		}
     	
-    	log.info("ItemRestrict has been successfully loaded!");
+    	log.info(pluginName + " loaded successfully!");
 	}
 	
 	public void onReload() {
@@ -147,10 +120,16 @@ public class ItemRestrict extends JavaPlugin {
 		enforcementWorlds.clear();
 		ownershipBanned.clear();
 		craftingBanned.clear();
+		smeltingBanned.clear();
+		craftingDisabled.clear();
 		brewingBanned.clear();
+		wearingBanned.clear();
 		creativeBanned.clear();
 		usageBanned.clear();
 		placementBanned.clear();
+		blockBreakBanned.clear();
+		pickupBanned.clear();
+		dropBanned.clear();
 		worldBanned.clear();
 		
 		//Load Configuration
@@ -158,16 +137,86 @@ public class ItemRestrict extends JavaPlugin {
         //Load Restricted Items
         restrictedHandler = new RestrictedItemsHandler(this);
         
+        //Restore recipes
+        ds.restoreRecipes();
+        
+        if (configHandler.getBoolean("General.WorldScannerON") == true && worldScanner.containsKey(false)) {
+        	ws.worldScanTask();
+        } else if (configHandler.getBoolean("General.WorldScannerON") == false && worldScanner.containsKey(true)) {
+        	Bukkit.getScheduler().cancelTask(worldScanner.get(true));
+        	worldScanner.clear();
+        	worldScanner.put(false, 0);
+        }
+        if (configHandler.getBoolean("General.Restrictions.ArmorWearingBans") == true && wearingScanner.containsKey(false)) {
+        	es.wearingScanTask();
+        } else if (configHandler.getBoolean("General.Restrictions.ArmorWearingBans") == false && wearingScanner.containsKey(true)) {
+        	Bukkit.getScheduler().cancelTask(wearingScanner.get(true));
+        	wearingScanner.clear();
+        	wearingScanner.put(false, 0);
+        }
+        
+        //Disable Recipes Task
+        ds.disableRecipesTask(1);
+        
+        printConsoleStatus();
+        
         log.info("Reload complete!");
 	}
 	
 	public void onDisable() {
-		log.info("ItemRestrict has been disabled.");
+		Bukkit.getScheduler().cancelTasks(this);
+		HandlerList.unregisterAll(this);
+		log.info(pluginName + " is disabled!");
 	}
 	
-	public static String getFriendlyLocationString(Location location) 
-	{
-		return location.getWorld().getName() + "(" + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + ")";
+	private void printConsoleStatus() {
+		if (configHandler.getBoolean("General.Restrictions.EnableBrewingBans") == true) {
+    		log.info("Brewing restrictions enabled!");
+    	} else {
+    		log.info("Brewing restrictions disabled!");
+    	}
+        if (configHandler.getBoolean("General.Restrictions.ArmorWearingBans") == true) {
+    		log.info("Wearing restrictions enabled!");
+    	} else {
+    		log.info("Wearing restrictions disabled!");
+    	}
+        if (configHandler.getBoolean("General.Restrictions.CreativeBans") == true) {
+    		log.info("Creative restrictions enabled!");
+    	} else {
+    		log.info("Creative restrictions disabled!");
+    	}
+        if (configHandler.getBoolean("General.Restrictions.PickupBans") == true) {
+    		log.info("Pickup restrictions enabled!");
+    	} else {
+    		log.info("Pickup restrictions disabled!");
+    	}
+        if (configHandler.getBoolean("General.Restrictions.DropBans") == true) {
+    		log.info("Drop restrictions enabled!");
+    	} else {
+    		log.info("Drop restrictions disabled!");
+    	}
+        if (configHandler.getBoolean("General.Restrictions.BreakBans") == true) {
+    		log.info("Block break restrictions enabled!");
+    	} else {
+    		log.info("Block break restrictions disabled!");
+    	}
+        if (configHandler.getBoolean("General.WorldScannerON") == true) {
+    		log.info("WorldScanner is enabled!");
+		} else {
+			log.info("WorldScanner is disabled!");
+		}
+	}
+	
+	private void checkServerVersion() {
+		String[] serverVersion = Bukkit.getBukkitVersion().split("-");
+	    String version = serverVersion[0];
+	    log.info("Server version detected: " + version);
+	    if (version.matches("1.6.4")) {
+	    	mcpcServer = true;
+	    	is19Server = false;
+	    } else if (version.matches("1.7.10") || version.matches("1.8") || version.matches("1.8.3") || version.matches("1.8.8") || version.matches("1.8.7") || version.matches("1.8.6") || version.matches("1.8.5") || version.matches("1.8.4")) {
+	    	is19Server = false;
+	    }
 	}
 	
 	//Getting other classes public
@@ -177,92 +226,11 @@ public class ItemRestrict extends JavaPlugin {
 	public RestrictedItemsHandler getRestrictedItemsHandler() {
 		return restrictedHandler;
 	}
-	public MaterialData getMaterialData() {
-		return materialData;
+	public DisableRecipe getDisableRecipe() {
+		return ds;
 	}
-	public MaterialCollection getMaterialCollection() {
-		return materialCollection;
-	}
-	
-	//WEARING RESTRICTIONS TASK
-	private void wearingRestrictions() {
-		Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
-			@SuppressWarnings("deprecation")
-			@Override
-			public void run() {
-				for (final Player p : Bukkit.getOnlinePlayers()) {
-					final ItemStack boots = p.getInventory().getBoots();
-					final ItemStack leggings = p.getInventory().getLeggings();
-					final ItemStack chestplate = p.getInventory().getChestplate();
-					final ItemStack helmet = p.getInventory().getHelmet();
-					
-					if (boots != null) {
-						MaterialData bannedInfo = getRestrictedItemsHandler().isBanned(ActionType.Wearing, p, boots.getTypeId(), boots.getData().getData(), p.getLocation());
-						if (bannedInfo != null) {
-							getConfigHandler().printMessage(p, "chatMessages.wearingRestricted", bannedInfo.reason);
-							Bukkit.getScheduler().runTask(ItemRestrict.this, new Runnable() {
-								@Override
-								public void run() {
-									
-									p.getWorld().dropItem(p.getLocation(), boots);
-									p.getInventory().setBoots(new ItemStack(Material.AIR));
-									p.updateInventory();
-									p.playSound(p.getLocation(), Sound.NOTE_PLING, 1, 1);
-								}
-							});
-						}
-					}
-					if (leggings != null) {
-						MaterialData bannedInfo = getRestrictedItemsHandler().isBanned(ActionType.Wearing, p, leggings.getTypeId(), leggings.getData().getData(), p.getLocation());
-						if (bannedInfo != null) {
-							getConfigHandler().printMessage(p, "chatMessages.wearingRestricted", bannedInfo.reason);
-							Bukkit.getScheduler().runTask(ItemRestrict.this, new Runnable() {
-								@Override
-								public void run() {
-									
-									p.getWorld().dropItem(p.getLocation(), leggings);
-									p.getInventory().setLeggings(new ItemStack(Material.AIR));
-									p.updateInventory();
-									p.playSound(p.getLocation(), Sound.NOTE_PLING, 1, 1);
-								}
-							});
-						}
-					}
-					if (chestplate != null) {
-						MaterialData bannedInfo = getRestrictedItemsHandler().isBanned(ActionType.Wearing, p, chestplate.getTypeId(), chestplate.getData().getData(), p.getLocation());
-						if (bannedInfo != null) {
-							getConfigHandler().printMessage(p, "chatMessages.wearingRestricted", bannedInfo.reason);
-							Bukkit.getScheduler().runTask(ItemRestrict.this, new Runnable() {
-								@Override
-								public void run() {
-									
-									p.getWorld().dropItem(p.getLocation(), chestplate);
-									p.getInventory().setChestplate(new ItemStack(Material.AIR));
-									p.updateInventory();
-									p.playSound(p.getLocation(), Sound.NOTE_PLING, 1, 1);
-								}
-							});
-						}
-					}
-					if (helmet != null) {
-						MaterialData bannedInfo = getRestrictedItemsHandler().isBanned(ActionType.Wearing, p, helmet.getTypeId(), helmet.getData().getData(), p.getLocation());
-						if (bannedInfo != null) {
-							getConfigHandler().printMessage(p, "chatMessages.wearingRestricted", bannedInfo.reason);
-							Bukkit.getScheduler().runTask(ItemRestrict.this, new Runnable() {
-								@Override
-								public void run() {
-									
-									p.getWorld().dropItem(p.getLocation(), helmet);
-									p.getInventory().setHelmet(new ItemStack(Material.AIR));
-									p.updateInventory();
-									p.playSound(p.getLocation(), Sound.NOTE_PLING, 1, 1);
-								}
-							});
-						}
-					}
-				}
-			}
-		}, 20L, 20L);
+	public SoundHandler getSoundHandler() {
+		return sH;
 	}
 
 }

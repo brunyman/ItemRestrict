@@ -1,7 +1,6 @@
 package net.craftersland.itemrestrict;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -41,17 +40,13 @@ public class CommandHandler implements CommandExecutor {
 							itemrestrict.onReload();
 							
 							itemrestrict.getConfigHandler().printMessage(p, "chatMessages.reload", "");
-							if (itemrestrict.getConfigHandler().getString("General.Sounds.onCommands").matches("true")) {
-								p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
-							}
+							itemrestrict.getSoundHandler().sendLevelUpSound(p);
 							
 							return true;
 						} else {
 							itemrestrict.getConfigHandler().printMessage(p, "chatMessages.noPermission", "");
 							
-							if (itemrestrict.getConfigHandler().getString("General.Sounds.onCommands").matches("true")) {
-								p.playSound(p.getLocation(), Sound.NOTE_PLING, 1.0F, 1.0F);
-							}
+							itemrestrict.getSoundHandler().sendPlingSound(p);
 							return false;
 						}
 					} else {
@@ -76,9 +71,7 @@ public class CommandHandler implements CommandExecutor {
 				if (sender instanceof Player) {
 					p = (Player) sender;
 					itemrestrict.getConfigHandler().printMessage(p, "chatMessages.unknownCommand", "");
-					if (itemrestrict.getConfigHandler().getString("General.Sounds.onCommands").matches("true")) {
-						p.playSound(p.getLocation(), Sound.NOTE_PLING, 1.0F, 1.0F);
-					}
+					itemrestrict.getSoundHandler().sendPlingSound(p);
 				} else {
 					sender.sendMessage(ChatColor.RED + "Unknown command for help do /itemrestrict");
 				}
@@ -90,7 +83,7 @@ public class CommandHandler implements CommandExecutor {
 	//Player help page
 	public void sendHelp(Player p) {
 		if (itemrestrict.getConfigHandler().getString("General.Sounds.onCommands").matches("true")) {
-			p.playSound(p.getLocation(), Sound.ANVIL_LAND, 1, 1);
+			itemrestrict.getSoundHandler().sendAnvilLandSound(p);
 		}
 		
 		p.sendMessage(" ");
