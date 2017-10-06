@@ -35,8 +35,8 @@ public class ItemRestrict extends JavaPlugin {
 	public static Logger log;
 	public static String pluginName = "ItemRestrict";
 	
-	public ArrayList<World> enforcementWorlds = new ArrayList<World>();
-	public MaterialCollection ownershipBanned = new MaterialCollection();
+	public static ArrayList<World> enforcementWorlds = new ArrayList<World>();
+	public static MaterialCollection ownershipBanned = new MaterialCollection();
 	public MaterialCollection craftingBanned = new MaterialCollection();
 	public MaterialCollection smeltingBanned = new MaterialCollection();
 	public List<String> craftingDisabled = new ArrayList<String>();
@@ -56,6 +56,7 @@ public class ItemRestrict extends JavaPlugin {
 	
 	public boolean mcpcServer = false;
 	public boolean is19Server = true;
+	public boolean is112Server = false;
 	
 	private static ConfigHandler configHandler;
 	private static RestrictedItemsHandler restrictedHandler;
@@ -80,7 +81,11 @@ public class ItemRestrict extends JavaPlugin {
         //Load Classes
         ws = new WorldScanner(this);
         es = new WearingScanner(this);
-        ds = new DisableRecipe(this);
+        if (is112Server == false) {
+        	ds = new DisableRecipe(this);
+        } else {
+        	log.warning("Removing recipes from the game is not possible in 1.12 due to a spigot bug: https://goo.gl/4v71Zv .Use CraftingBanned feature until this is fixed!");
+        }
         sH = new SoundHandler(this);
         
         //Register Listeners
@@ -138,8 +143,9 @@ public class ItemRestrict extends JavaPlugin {
         restrictedHandler = new RestrictedItemsHandler(this);
         
         //Restore recipes
-        ds.restoreRecipes();
-        
+        if (is112Server == false) {
+        	ds.restoreRecipes();
+        }
         if (configHandler.getBoolean("General.WorldScannerON") == true && worldScanner.containsKey(false)) {
         	ws.worldScanTask();
         } else if (configHandler.getBoolean("General.WorldScannerON") == false && worldScanner.containsKey(true)) {
@@ -156,7 +162,11 @@ public class ItemRestrict extends JavaPlugin {
         }
         
         //Disable Recipes Task
-        ds.disableRecipesTask(1);
+        if (is112Server == false) {
+        	ds.disableRecipesTask(1);
+        } else {
+        	log.warning("Removing recipes from the game is not possible in 1.12 due to a spigot bug: https://goo.gl/4v71Zv .Use CraftingBanned feature until this is fixed!");
+        }
         
         printConsoleStatus();
         
@@ -216,6 +226,8 @@ public class ItemRestrict extends JavaPlugin {
 	    	is19Server = false;
 	    } else if (version.matches("1.7.10") || version.matches("1.8") || version.matches("1.8.3") || version.matches("1.8.8") || version.matches("1.8.7") || version.matches("1.8.6") || version.matches("1.8.5") || version.matches("1.8.4")) {
 	    	is19Server = false;
+	    } else if (version.matches("1.12") || version.matches("1.12.1") || version.matches("1.12.2")) {
+	    	is112Server = true;
 	    }
 	}
 	

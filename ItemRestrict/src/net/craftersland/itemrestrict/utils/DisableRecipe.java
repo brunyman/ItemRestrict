@@ -16,15 +16,13 @@ public class DisableRecipe {
 	public DisableRecipe(ItemRestrict ir) {
 		this.ir = ir;
 		
-		disableRecipesTask(20);
-		disableRecipesTask(600);
+		disableRecipesTask(5);
 	}
 	
 	private void removeRecipe(ItemStack is) {
-	     
         Iterator<Recipe> it = Bukkit.getServer().recipeIterator();
-        Recipe recipe;
-        while(it.hasNext()) {
+        Recipe recipe = null;
+        while (it.hasNext()) {
             recipe = it.next();
             if (recipe != null && recipe.getResult().isSimilar(is)) {
             	ir.disabledRecipes.add(recipe);
@@ -38,7 +36,7 @@ public class DisableRecipe {
 
 			@SuppressWarnings("deprecation")
 			@Override
-			public void run() {			
+			public void run() {
 				if (ir.craftingDisabled.isEmpty() == false) {
 					for (String s : ir.craftingDisabled) {
 						String[] s1 = s.split(":");
@@ -59,29 +57,9 @@ public class DisableRecipe {
 						}
 					}
 				}
-				if (ir.smeltingDisabled.isEmpty() == false) {
-					for (String s : ir.smeltingDisabled) {
-						String[] s1 = s.split(":");
-						try {
-							int id = Integer.parseInt(s1[0]);
-							Material m = Material.getMaterial(id);
-							ItemStack is = null;
-							if (s1[1].contains("*") == true) {
-								is = new ItemStack(m);
-							} else {
-								short b = Short.parseShort(s1[1]);
-								is = new ItemStack(m, 1, b);
-							}
-							
-							removeRecipe(is);
-						} catch (Exception e) {
-							ItemRestrict.log.warning("Failed to disable smelting for item: " + s1[0] + ":" + s1[1] + " . Error: " + e.getMessage());
-						}
-					}
-				}
 			}
 			
-		}, delay * 1L);
+		}, delay * 20L);
 	}
 	
 	public void restoreRecipes() {

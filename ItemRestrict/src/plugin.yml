@@ -1,6 +1,6 @@
 name: ItemRestrict
 main: net.craftersland.itemrestrict.ItemRestrict
-version: 2.4.0
+version: 2.4.1
 author: CraftersLand
 load: POSTWORLD
 website: www.craftersland.net
